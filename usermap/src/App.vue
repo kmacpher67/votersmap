@@ -14,7 +14,9 @@ import HelloWorld from '@/components/HelloWorld.vue';
 
 console.log('vue-App.vue - script HelloWorld default components before export default {' );
 
-const GOOGLE_MAP_KEY = process.env.GOOGLE_MAP_KEY || "NOTHERE";
+// sed script to replace the following line GOOGLE_MAPS_API_KEY_ REPLACE
+// RUN sed -i "s/GOOGLE_MAPS_API_KEY_ REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/App.vue
+const GOOGLE_MAP_KEY = process.env.GOOGLE_MAP_KEY || "GOOGLE_MAPS_API_KEY_REPLACE";
 console.log('vue-App.vue - script - GOOGLE_MAP_KEY= ' + GOOGLE_MAP_KEY);
 
 export default {

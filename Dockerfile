@@ -16,6 +16,16 @@ COPY ./docker-run-nest.sh ./
 
 RUN /usr/local/bin/npm run build
 
+# COPY front end web code 
+COPY ./usermap/ ./usermap/
+
+RUN npm install -g @vue/cli
+RUN cd usermap; npm install
+RUN echo "the var GOOGLE_MAPS_API_KEY should be set "; [ -z "$var" ] && echo "Empty"
+RUN sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/App.vue
+RUN cd usermap; npm run build  
+
+
 # RUN npm install
 RUN /usr/local/bin/npm i -g @nestjs/cli
 
