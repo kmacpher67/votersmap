@@ -10,8 +10,6 @@ RUN /usr/local/bin/npm install
 
 COPY ./*.js* ./
 COPY ./src ./src
-COPY ./views ./views
-COPY ./public ./public
 COPY ./nest-cli.json ./
 COPY ./tsconfig* ./
 COPY ./docker-run-nest.sh ./

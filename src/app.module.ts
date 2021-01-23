@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { SmstextModule } from './smstext/smstext.module';
 import { LookupController } from './lookup/lookup.controller';
 import { LookupaddressService } from './lookupaddress/lookupaddress.service';
@@ -12,7 +13,7 @@ import { UsersService } from './users/users.service';
 import { UsersModule } from './users/users.module';
 import { Users } from './users';
 import { UsersController } from './users/users.controller';
-
+import { join } from 'path';
 
 
 // https://docs.nestjs.com/techniques/configuration
@@ -21,9 +22,14 @@ import { UsersController } from './users/users.controller';
 // ConfigModule.forRoot({
 //   envFilePath: '.development.env',
 // });
-const mongoDBUrl = process.env.MONGODB_URI
+
+const mongoDBUrl = process.env.MONGODB_URI || "mongodb://mongodb:27017/test"
+console.log('app.module.ts - MongooseModule mongoDBUrl=' + mongoDBUrl);
 @Module({
   imports: [SmstextModule, 
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
     MongooseModule.forRoot(mongoDBUrl, {
       connectionName: 'voters',
     }),
@@ -31,6 +37,9 @@ const mongoDBUrl = process.env.MONGODB_URI
       isGlobal: true,
       }),
     MongooseModule.forFeature([{ name: Voter.name, schema: VoterSchema }], 'voters'),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'usermap/dist'),   // <-- path to the static files
+    }),
     UsersModule,
     ],
   controllers: [AppController, LookupController, UsersController],
