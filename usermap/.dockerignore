@@ -1,0 +1,10 @@
+# In .dockerignore
+Dockerfile
+
+# node
+node_modules
+package-lock.json
+
+# mongo
+db
+db/WiredTiger

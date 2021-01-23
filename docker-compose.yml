@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+ 
+  vuejswebapp:
+    build: usermap/.
+    depends_on:
+      - smstest
+    ports:
+      - "8080:8080"
+    environment:
+      - GOOGLE_MAP_KEY:"${GOOGLE_MAP_KEY}"
+    volumes:
+      - ./usermap:/usr/src/app
+    networks:
+      - kennet
+
+  smstest:
+    build: .
+    depends_on:
+      - mongodb
+    ports:
+      - "3000:3000"
+    environment:
+      - GOOGLE_MAP_KEY:"${GOOGLE_MAP_KEY}"
+      - MONGODB_URI:"mongodb://mongodb:27017/test"
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - kennet
+    restart: always
+
+  mongodb:
+    container_name: mongo
+    image: mongo:4.4.3
+    environment:
+      - MONGO_INITDB_DATABASE=test
+    ports:
+      - 27017:27017
+    volumes:
+      - ./db:/data/db
+    networks:
+      - kennet
+
+networks:
+  kennet:
+    driver: bridge
