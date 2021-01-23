@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <h1> test me </h1>
     <hello-world />
+    <h6>@KenMacPherson 2010-2021 Help for the voters.</h6>
   </div>
 </template>
 

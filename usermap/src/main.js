@@ -1,10 +1,12 @@
 import Vue from 'vue'
 import App from './App.vue'
 import * as VueGoogleMaps from "vue2-google-maps";
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 
 Vue.config.productionTip = false
 
-const GOOGLE_MAP_KEY = process.env.GOOGLE_MAP_KEY || "NOTHERE";
+const GOOGLE_MAP_KEY = process.env.GOOGLE_MAP_KEY || "GOOGLE_MAPS_API_KEY_REPLACE";
 console.log('vue-main.js - GOOGLE_MAP_KEY= ' + GOOGLE_MAP_KEY);
 
 Vue.use(VueGoogleMaps, {
@@ -13,6 +15,8 @@ Vue.use(VueGoogleMaps, {
     libraries: "places" // necessary for places input
   }
 });
+
+Vue.use(VueAxios, axios);
 
 new Vue({
   el: "#app",
