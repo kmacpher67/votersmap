@@ -1,13 +1,18 @@
 <template>
   <div>
-      <h1> Voters </h1>
     <div>
-      <h2>Search and add a pin</h2>
+      <h2>Voter Mapper Search and find.</h2>
       <label>
         <gmap-autocomplete
           @place_changed="setPlace">
         </gmap-autocomplete>
         <button @click="addMarker">Add</button>
+      </label>
+      <label>
+        <button @click="geolocate">Me.</button>
+      </label>
+      <label>
+            <button @click="clickMe">Users</button>
       </label>
       <br/>
 
@@ -15,13 +20,18 @@
     <br>
     <gmap-map
       :center="center"
-      :zoom="12"
+      :zoom=zoom
+      :fullscreenControl=true
+      :zoomControl=true
+      :streetViewControl=true
       style="width:100%;  height: 400px;"
     >
       <gmap-marker
         :key="index"
         v-for="(m, index) in markers"
         :position="m.position"
+        :label="m.label"
+        :title="m.title"
         @click="center=m.position"
       ></gmap-marker>
     </gmap-map>
@@ -29,8 +39,6 @@
 </template>
 
 <script>
-
-
 export default {
   name: "GoogleMap",
   data() {
@@ -40,7 +48,10 @@ export default {
       // 41.238553,-80.8258473
       center: { lat: 41.238553, lng: -80.8258473 },
       markers: [],
+      voters: [],
       places: [],
+      users: [{name: 'kenny', position:{lat:41.238553, lng:-80.8258473}}],
+      zoom:16,
       currentPlace: null
     };
   },
@@ -49,13 +60,25 @@ export default {
     console.log('mounted method... in vue.use');
     this.geolocate();
     this.getUser();
-    this.initializeMap()
+    this.changeZoom();
+    this.getVoters();
+    this.clickMe();
+    this.fitBounds();
   },
 
   methods: {
     // receives a place object via the autocomplete component
     setPlace(place) {
+      console.log('setPlace(place)  = ' + place);
       this.currentPlace = place;
+    },
+    changeZoom(zoomChangeValue) {
+      console.log('change zoom in zoomChangeValue=' + zoomChangeValue);
+      this.zoom = this.zoom+zoomChangeValue || 16;
+    },
+    centerPage(positionLatLng) {
+        console.log(' enterPage(positionLatLng)=' + positionLatLng);
+        this.center = positionLatLng;
     },
     addMarker() {
       if (this.currentPlace) {
@@ -69,20 +92,68 @@ export default {
         this.currentPlace = null;
       }
     },
+    clickMe: function() {
+      console.log('clicking me users=' + this.users);
+      this.getUser();
+      console.log('clicking me users=' + this.users);
+      this.users.forEach( (user ) => {
+        console.log('setting markers on user='+ user);
+        const marker = {
+                title: user.name,
+                label: user.name,
+                position: {
+                    lat: user.position.lat,
+                    lng: user.position.lng
+                    }
+                };
+          this.markers.push(marker );
+        // this.places.push(this.currentPlace);
+      });
+
+    },fitBounds: function(){
+          console.log('fitBounds' );
+          // var b = new google.maps.LatLngBounds();
+    },
     geolocate: function() {
       navigator.geolocation.getCurrentPosition(position => {
+        console.log('geolocate' + JSON.stringify(position, null, 3));
         this.center = {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
       });
     },
+    getVoters() {
+      console.log('getVoters() /warrenvoters ')
+      this.axios.get('/warrenvoters').then(response => {
+              console.log(response.data);
+              this.voters = response.data;
+          }).catch(function (error) {
+        // handle error
+        console.log(error);
+        this.voters = [{"_id":"600adb4cad4ca1e0eeeba965","SOS_VOTERID":"OH0015769681","COUNTY_NUMBER":"78","COUNTY_ID":"26999","LAST_NAME":"PATSY","FIRST_NAME":"HOLLY","MIDDLE_NAME":"ELAINE","SUFFIX":"","DATE_OF_BIRTH":"1956-10-11","REGISTRATION_DATE":"1988-05-11","VOTER_STATUS":"ACTIVE","PARTY_AFFILIATION":"D","RESIDENTIAL_ADDRESS1":"2415 PARKWOOD DR NW","RESIDENTIAL_SECONDARY_ADDR":"","RESIDENTIAL_CITY":"WARREN","RESIDENTIAL_STATE":"OH","RESIDENTIAL_ZIP":"44485","RESIDENTIAL_ZIP_PLUS4":"","RESIDENTIAL_COUNTRY":"","RESIDENTIAL_POSTALCODE":"","MAILING_ADDRESS1":"","MAILING_SECONDARY_ADDRESS":"","MAILING_CITY":"","MAILING_STATE":"","MAILING_ZIP":"","MAILING_ZIP_PLUS4":"","MAILING_COUNTRY":"","MAILING_POSTAL_CODE":"","CAREER_CENTER":"TRUMBULL CAREER & TECH CENTER","CITY":"WARREN CITY","CITY_SCHOOL_DISTRICT":"WARREN CITY SD","COUNTY_COURT_DISTRICT":"","CONGRESSIONAL_DISTRICT":"13","COURT_OF_APPEALS":"11","EDU_SERVICE_CENTER_DISTRICT":"","EXEMPTED_VILL_SCHOOL_DISTRICT":"","LIBRARY":"","LOCAL_SCHOOL_DISTRICT":"","MUNICIPAL_COURT_DISTRICT":"WARREN","PRECINCT_NAME":"WARREN CITY 7C","PRECINCT_CODE":"78-P-AEK","STATE_BOARD_OF_EDUCATION":"07","STATE_REPRESENTATIVE_DISTRICT":"64","STATE_SENATE_DISTRICT":"32","TOWNSHIP":"","VILLAGE":"","WARD":"WARREN-WARD 7","PRIMARY-03/07/2000":"X","GENERAL-11/07/2000":"X","SPECIAL-05/08/2001":"X","GENERAL-11/06/2001":"X","PRIMARY-05/07/2002":"X","GENERAL-11/05/2002":"X","SPECIAL-05/06/2003":"X","GENERAL-11/04/2003":"X","PRIMARY-03/02/2004":"X","GENERAL-11/02/2004":"X","SPECIAL-02/08/2005":"","PRIMARY-05/03/2005":"","PRIMARY-09/13/2005":"","GENERAL-11/08/2005":"X","SPECIAL-02/07/2006":"","PRIMARY-05/02/2006":"X","GENERAL-11/07/2006":"X","PRIMARY-05/08/2007":"","PRIMARY-09/11/2007":"","GENERAL-11/06/2007":"X","PRIMARY-11/06/2007":"","GENERAL-12/11/2007":"","PRIMARY-03/04/2008":"D","PRIMARY-10/14/2008":"","GENERAL-11/04/2008":"X","GENERAL-11/18/2008":"","PRIMARY-05/05/2009":"","PRIMARY-09/08/2009":"","PRIMARY-09/15/2009":"","PRIMARY-09/29/2009":"","GENERAL-11/03/2009":"X","PRIMARY-05/04/2010":"D","PRIMARY-07/13/2010":"","PRIMARY-09/07/2010":"","GENERAL-11/02/2010":"X","PRIMARY-05/03/2011":"D","PRIMARY-09/13/2011":"","GENERAL-11/08/2011":"X","PRIMARY-03/06/2012":"D","GENERAL-11/06/2012":"X","PRIMARY-05/07/2013":"","PRIMARY-09/10/2013":"","PRIMARY-10/01/2013":"","GENERAL-11/05/2013":"","PRIMARY-05/06/2014":"D","GENERAL-11/04/2014":"X","PRIMARY-05/05/2015":"D","PRIMARY-09/15/2015":"","GENERAL-11/03/2015":"X","PRIMARY-03/15/2016":"D","GENERAL-06/07/2016":"","PRIMARY-09/13/2016":"","GENERAL-11/08/2016":"X","PRIMARY-05/02/2017":"","PRIMARY-09/12/2017":"","GENERAL-11/07/2017":"X","PRIMARY-05/08/2018":"D","GENERAL-08/07/2018":"","GENERAL-11/06/2018":"X","PRIMARY-05/07/2019":"D","PRIMARY-09/10/2019":"","GENERAL-11/05/2019":"X","PRIMARY-03/17/2020":"D","GENERAL-11/03/2020":""}];
+        });
+      },
     getUser() {
-                this.axios.get('/users').then(response => {
-                    console.log(response.data);
-                    this.users = this.getRandomUsers(response.data, 6)
-                });
-            },
+      console.log('getUser() ')
+      this.users = this.setDefaultUsers();
+      this.axios.get('/users').then(response => {
+              console.log(response.data);
+              this.users = this.getRandomUsers(response.data, 6)
+          }).catch(function (error) {
+            // handle error
+            console.log('getUser() { error occurred');
+            this.users = this.setDefaultUsers();
+            console.log(error);
+        });
+        console.log('getUser() - this users = ' + this.users);
+      },
+    setDefaultUsers() {
+      console.log('setting defult users');
+      const DEF_USERS = [{"name": 'Oluyemi', "position": {"lat":41.238553, "lng": -80.8258473}}, {"name": 'kenny', "position":{"lat":41.2376032, "lng":-80.8104914}}];
+      this.users = DEF_USERS;
+      return DEF_USERS;
+    },
     getRandomUsers(people, number) {
         console.log('getRandomUsers');
         const selected = [];

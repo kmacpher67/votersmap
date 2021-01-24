@@ -5,12 +5,12 @@
   </div>
 </template>
 
-
 <script>
 // import HelloWorld from "@/components/HelloWorld"
 import HelloWorld from '@/components/HelloWorld.vue';
 // import {Client} from "@googlemaps/google-maps-services-js";
 // import {gmapApi} from 'vue2-google-maps'
+import gmapsInit from '@/gmaps';
 
 console.log('vue-App.vue - script HelloWorld default components before export default {' );
 
@@ -24,12 +24,29 @@ export default {
   name: 'App',
   Components: {
     HelloWorld    
-  }
-}
+  },
+  async mounted() {
+    try {
+      const google = await gmapsInit();
+
+      const geocoder = new google.maps.Geocoder();
+      const map = new google.maps.Map(this.$el);
+
+      geocoder.geocode({ address: 'Austria' }, (results, status) => {
+        if (status !== 'OK' || !results[0]) {
+          throw new Error(status);
+        }
+
+        map.setCenter(results[0].geometry.location);
+        map.fitBounds(results[0].geometry.viewport);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+};
 
 </script>
-
-
 
 <style>
 #app {

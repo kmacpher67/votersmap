@@ -6,7 +6,7 @@ import VueAxios from 'vue-axios'
 
 Vue.config.productionTip = false
 
-const GOOGLE_MAP_KEY = process.env.GOOGLE_MAP_KEY || "GOOGLE_MAPS_API_KEY_REPLACE";
+const GOOGLE_MAP_KEY = process.env.GOOGLE_MAP_KEY || "AIzaSyAfVlHH4ZLf4oy7dilAaBQACNGzLPZw9IM";
 console.log('vue-main.js - GOOGLE_MAP_KEY= ' + GOOGLE_MAP_KEY);
 
 Vue.use(VueGoogleMaps, {
