@@ -14,10 +14,7 @@
       <label>
             <button @click="clickMe">Users</button>
       </label>
-      <br/>
-
     </div>
-    <br>
     <gmap-map
       :center="center"
       :zoom=zoom
@@ -26,14 +23,14 @@
       :streetViewControl=true
       style="width:100%;  height: 400px;"
     >
-      <gmap-marker
-        :key="index"
-        v-for="(m, index) in markers"
-        :position="m.position"
-        :label="m.label"
-        :title="m.title"
-        @click="center=m.position"
-      ></gmap-marker>
+        <gmap-marker
+          :key="index"
+          v-for="(m, index) in markers"
+          :position="m.position"
+          :label="m.label"
+          :title="m.title"
+          @click="center=m.position"
+        ></gmap-marker>
     </gmap-map>
   </div>
 </template>
@@ -50,6 +47,7 @@ export default {
       markers: [],
       voters: [],
       places: [],
+      wards: [],
       users: [{name: 'kenny', position:{lat:41.238553, lng:-80.8258473}}],
       zoom:16,
       currentPlace: null

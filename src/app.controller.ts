@@ -3,6 +3,7 @@ import { AppService } from './app.service';
 import { VoterService } from './voter/voter.service';
 import { Request } from 'express';
 import {Voter} from './voter/schemas/voter.schema'
+import { waitForDebugger } from 'inspector';
 
 @Controller()
 export class AppController {
@@ -24,16 +25,22 @@ export class AppController {
     return this.appService.findAll();
   }
 
-  @Get('warren7ward/:user')
-  async getWarren7Ward(@Param() params): Promise<Voter[]> {
-    console.log(params);
-    
-    return this.appService.findWard(null);
+  // db.getCollection('voters').distinct('WARD')
+  @Get('listofwards')
+  async getListofWards(@Param() params): Promise<Voter[]> {
+    return this.appService.getListOfwards(params);
   }
 
-  @Get('warrenvoter')
-  async getWarrenVoter(): Promise<Voter[]> {
-    return this.appService.findOne();
+  @Get('getward/:ward')
+  async getWard(@Param() params): Promise<Voter[]> {
+    console.log(params);
+    
+    return this.appService.findWard(params);
+  }
+
+  @Get('warrenvoter/:voter')
+  async getWarrenVoter(@Param() params): Promise<Voter[]> {
+    return this.appService.findOne(params);
   }
 
   @Get('findall')
