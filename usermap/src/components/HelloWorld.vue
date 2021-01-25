@@ -8,16 +8,16 @@
         <!-- <button @click="addMarker">Add</button>
       </label> -->
 
-        <select class="form-control" @change="getPrecints($event)">
+        <select class="wardSelected" @change="getPrecints($event)">
           <option value="WARREN-WARD 5">WARREN-WARD 5</option>
           <option v-for="ward in wards" :value="ward" :key="ward">{{ ward }}</option>
         </select>
-        <select class="form-control" @change="precinctChange($event)">
-          <option value="precints[0]" >{{precincts[0]}}</option>
+        <select class="precinctSelected" v-model="precinctSelected" @change="precinctChange($event)">
+          <option selected: value="WARREN CITY 5K" >WARREN CITY 5K</option>
           <option v-for="precint in precincts" :value="precint" :key="precint">{{ precint }}</option>
         </select>
       <label>
-        <button @click="scoreLimit">score{{scoreLimit}}</button>
+        <button @click="incrementScore" v-b-tooltip.hover title="totalScore Limit">{{scoreLimit}}</button>
       </label>
       <label>
         <button @click="getVoters">voters</button>
@@ -30,7 +30,7 @@
       :fullscreenControl=true
       :zoomControl=true
       :streetViewControl=true
-      style="width:100%; height:690px;"
+      style="width:100%; height:660px;"
     >
         <gmap-marker
           :key="index"
@@ -61,6 +61,8 @@ export default {
       precincts: ["WARREN CITY 1A","WARREN CITY 1B","WARREN CITY 1E","WARREN CITY 1G","WARREN CITY 2C","WARREN CITY 2F","WARREN CITY 2G","WARREN CITY 3D","WARREN CITY 3G","WARREN CITY 3J","WARREN CITY 3K","WARREN CITY 3L","WARREN CITY 4A","WARREN CITY 4D","WARREN CITY 4F","WARREN CITY 5D","WARREN CITY 5E","WARREN CITY 5F","WARREN CITY 5G","WARREN CITY 5K","WARREN CITY 6B","WARREN CITY 6D","WARREN CITY 6G","WARREN CITY 7A","WARREN CITY 7C","WARREN CITY 7D"],
       users: [{name: 'kenny', position:{lat:41.238553, lng:-80.8258473}}],
       zoom:14,
+      precinctSelected:"WARREN CITY 5K",
+      wardSelected:"WARREN-WARD 5",
       scoreLimit:5,
       currentPlace: null
     };
@@ -88,7 +90,7 @@ export default {
     },
     incrementScore(clickEvent) {
       console.log('incrementScore(clickEvent) {' + clickEvent);
-      
+      console.log('precinctSelected='+ this.precinctSelected);
       this.scoreLimit = this.scoreLimit+1;
       if (this.scoreLimit>39) {
         this.scoreLimit=0;
@@ -156,8 +158,9 @@ export default {
               });
     },
     precinctChange(events) {
-      var targetUrl='/getprecinctByScore/WARREN%20CITY%205K/'+ JSON.stringify(events, null,3);
+      var targetUrl='/getprecinctByScore/' + this.precinctSelected + JSON.stringify(events,null,3);
       console.log('precinctChange(events) { -- targetUrl=' + targetUrl);
+
     },
     getVoters() {
       var targetUrl='/getprecinctByScore/WARREN%20CITY%205K/'+this.scoreLimit;

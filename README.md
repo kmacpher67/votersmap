@@ -73,6 +73,7 @@ https://cli.vuejs.org/guide/deployment.html#general-guidelines
 ## UI vuejs
 
 npm install -g @vue/cli
+npm install -g @vue-cli-service
 
 
 ## cool end points for test see usermapper README
