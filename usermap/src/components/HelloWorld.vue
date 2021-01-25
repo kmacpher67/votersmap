@@ -38,6 +38,8 @@
           :position="m.position"
           :label="m.label"
           :title="m.title"
+          :icon="m.icon"
+          :zIndex="m.zIndex"
           @click="center=m.position"
         ></gmap-marker>
     </gmap-map>
@@ -192,16 +194,20 @@ export default {
                     }
                     const marker = {
                             title: voter.LAST_NAME+ voter.RESIDENTIAL_ADDRESS1,
-                            label: {text:voter.LAST_NAME+','+voter.totalVotes+voter.PARTY_AFFILIATION, fontSize:'10px'},
-                            zIndex: 1001 + (index % 3),
-                            labelStyle: {opacity: 1},
-                            icon: {url: iconurl},
+                            label: {text:voter.LAST_NAME+'~'+voter.totalVotes+voter.PARTY_AFFILIATION, fontSize:'9px', labelStyle: {opacity: 1}},
+                            zIndex: 100001 + (index % 3),
+                            icon: {
+                                url: iconurl,
+                                strokeColor: '#000000',
+                                strokeWeight: 1,
+                                scale: 2,
+                            },
                             position: {
                                 lat: voter.geometry.location.lat,
                                 lng: voter.geometry.location.lng
                                 }
                             };
-                      this.markers.push(marker );
+                      this.markers.push(marker);
                     // this.places.push(this.currentPlace);
               });
           
