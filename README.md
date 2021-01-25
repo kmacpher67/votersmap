@@ -74,6 +74,17 @@ https://cli.vuejs.org/guide/deployment.html#general-guidelines
 
 npm install -g @vue/cli
 
+
+## cool end points for test see usermapper README
+
+### precinct level: 
+http://localhost:3000/getprecinct/WARREN%20CITY%205K
+
+### ward level: 
+http://localhost:3000/getward/WARREN-WARD%207
+
+
+
 # Google maps geolocation 
 
 https://developers.google.com/maps/documentation/geocoding/overview

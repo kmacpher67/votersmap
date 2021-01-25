@@ -14,6 +14,13 @@ https://www.npmjs.com/package/@vue/cli-service-global
 https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome
 
 
+http://localhost:3000/getward/WARREN-WARD%207
+http://localhost:3000/getprecinct/WARREN%20CITY%205K
+
+http://localhost:3000/getprecinctByScore/WARREN%20CITY%205K
+
+
+
 ## Project setup
 ```
 npm install

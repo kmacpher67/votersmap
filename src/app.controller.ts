@@ -25,18 +25,46 @@ export class AppController {
     return this.appService.findAll();
   }
 
+    // db.getCollection('voters').distinct('WARD')
+    @Get('cities')
+    async getListofCities(@Param() params): Promise<Voter[]> {
+      return this.appService.getListOfWards(params);
+    }
+
   // db.getCollection('voters').distinct('WARD')
-  @Get('listofwards')
-  async getListofWards(@Param() params): Promise<Voter[]> {
-    return this.appService.getListOfwards(params);
+  @Get('wards')
+  async getListOfWards(@Param() params): Promise<Voter[]> {
+    return this.appService.getListOfWards(params);
   }
 
-  @Get('getward/:ward')
+  // db.getCollection('voters').distinct('WARD')
+  @Get('precincts')
+  async getListOfPrincints(@Param() params): Promise<Voter[]> {
+    return this.appService.getListOfPrincints(params);
+  }
+
+  @Get('getward/:WARD')
   async getWard(@Param() params): Promise<Voter[]> {
     console.log(params);
     
     return this.appService.findWard(params);
   }
+
+  @Get('getprecinct/:PRECINCT_NAME')
+  async getPrecinct(@Param() params): Promise<Voter[]> {
+    console.log(params);
+    
+    return this.appService.findWard(params);
+  }
+  
+
+  @Get('getprecinctByScore/:PRECINCT_NAME/:totalVotes')
+  async getprecinctByScore(@Param() params): Promise<Voter[]> {
+    console.log(params);
+    
+    return this.appService.findWard(params);
+  }
+
 
   @Get('warrenvoter/:voter')
   async getWarrenVoter(@Param() params): Promise<Voter[]> {

@@ -9,6 +9,11 @@ Vue.config.productionTip = false
 const GOOGLE_MAP_KEY = process.env.GOOGLE_MAP_KEY || "AIzaSyAfVlHH4ZLf4oy7dilAaBQACNGzLPZw9IM";
 console.log('vue-main.js - GOOGLE_MAP_KEY= ' + GOOGLE_MAP_KEY);
 
+// const DEFAULT_WARDS = ["WARREN-WARD 1", "WARREN-WARD 2",  "WARREN-WARD 3",  "WARREN-WARD 4",  "WARREN-WARD 5",  "WARREN-WARD 6","WARREN-WARD 7"];
+
+// const DEFAULT_PRECINCTS = ["WARREN CITY 5K"]
+
+
 Vue.use(VueGoogleMaps, {
   load: {
     key: GOOGLE_MAP_KEY,
