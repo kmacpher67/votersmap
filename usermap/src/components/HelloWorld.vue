@@ -1,13 +1,13 @@
 <template>
   <div>
     <div>
-      <h2>Voter Mapper Search and find.</h2>
-      <!-- <label>
-        <gmap-autocomplete
+      <label>Voter Mapper Search and find.</label><br>
+        <!-- <gmap-autocomplete
           @place_changed="setPlace">
-        </gmap-autocomplete>
-        <button @click="addMarker">Add</button>
+        </gmap-autocomplete> -->
+        <!-- <button @click="addMarker">Add</button>
       </label> -->
+
         <select class="form-control" @change="getPrecints($event)">
           <option value="WARREN-WARD 5">WARREN-WARD 5</option>
           <option v-for="ward in wards" :value="ward" :key="ward">{{ ward }}</option>
@@ -17,14 +17,11 @@
           <option v-for="precint in precincts" :value="precint" :key="precint">{{ precint }}</option>
         </select>
       <label>
-            <input v-model="scoreLimit" placeholder="scoreLimit" v-on:click="incrementScore($event)" size="4"> - 
+        <button @click="scoreLimit">score{{scoreLimit}}</button>
       </label>
       <label>
-        <button @click="getVoters">getVoters</button>
+        <button @click="getVoters">voters</button>
       </label>
-      <label>
-        <button @click="geolocate">Me.</button>
-      </label> 
       {{markers.length}}
     </div>
     <gmap-map
@@ -33,7 +30,7 @@
       :fullscreenControl=true
       :zoomControl=true
       :streetViewControl=true
-      style="width:100%;  height: 400px;"
+      style="width:100%; height:690px;"
     >
         <gmap-marker
           :key="index"
@@ -63,8 +60,8 @@ export default {
       wards: ["WARREN-WARD 1", "WARREN-WARD 2",  "WARREN-WARD 3",  "WARREN-WARD 4",  "WARREN-WARD 5",  "WARREN-WARD 6","WARREN-WARD 7"],
       precincts: ["WARREN CITY 1A","WARREN CITY 1B","WARREN CITY 1E","WARREN CITY 1G","WARREN CITY 2C","WARREN CITY 2F","WARREN CITY 2G","WARREN CITY 3D","WARREN CITY 3G","WARREN CITY 3J","WARREN CITY 3K","WARREN CITY 3L","WARREN CITY 4A","WARREN CITY 4D","WARREN CITY 4F","WARREN CITY 5D","WARREN CITY 5E","WARREN CITY 5F","WARREN CITY 5G","WARREN CITY 5K","WARREN CITY 6B","WARREN CITY 6D","WARREN CITY 6G","WARREN CITY 7A","WARREN CITY 7C","WARREN CITY 7D"],
       users: [{name: 'kenny', position:{lat:41.238553, lng:-80.8258473}}],
-      zoom:16,
-      scoreLimit:1,
+      zoom:14,
+      scoreLimit:5,
       currentPlace: null
     };
   },
@@ -181,7 +178,7 @@ export default {
                 var index = this.voters.indexOf(voter);
                 const marker = {
                         title: voter.LAST_NAME+ voter.RESIDENTIAL_ADDRESS1,
-                        label: voter.LAST_NAME+' v='+voter.totalVotes+voter.PARTY_AFFILIATION,
+                        label: voter.LAST_NAME+','+voter.totalVotes+voter.PARTY_AFFILIATION,
                         zIndex: 1001 + (index % 3),
                         labelStyle: {opacity: 1},
                         position: {

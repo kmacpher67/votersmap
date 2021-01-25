@@ -35,6 +35,8 @@ export class AppService {
     return this.voterModel.find(voter).exec();
   }
 
+  voterSummaryProjection = {"LAST_NAME":1, "DATE_OF_BIRTH":1, "RESIDENTIAL_ADDRESS1":1, "PARTY_AFFILIATION":1, "totalVotes":1, "demVotes":1, "repVotes":1, "geometry.$":1 };
+
   async findWard(voterQuery): Promise<Voter[]> {
     console.log('findWard(ward)=' + JSON.stringify(voterQuery, null, 3));
     if (null == voterQuery) {
@@ -46,7 +48,7 @@ export class AppService {
     voterQuery = this.addGeomtryCheck(voterQuery);
     voterQuery = this.parseTotalVotes(voterQuery);
 
-    return this.voterModel.find(voterQuery).exec();
+    return this.voterModel.find(voterQuery).select(this.voterSummaryProjection).exec();
   }
 
   //getListOfwards(params)
