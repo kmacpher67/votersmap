@@ -64,6 +64,9 @@ export default {
       precinctSelected:"WARREN CITY 5K",
       wardSelected:"WARREN-WARD 5",
       scoreLimit:5,
+      blueURL:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+      redURL:"http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+      greenURL:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",
       currentPlace: null
     };
   },
@@ -176,21 +179,30 @@ export default {
                 };
               }
               this.markers = [];
-                this.voters.forEach( (voter ) => {
-                //console.log('setting markers on voter='+ JSON.stringify(voter, null, 3));
-                var index = this.voters.indexOf(voter);
-                const marker = {
-                        title: voter.LAST_NAME+ voter.RESIDENTIAL_ADDRESS1,
-                        label: voter.LAST_NAME+','+voter.totalVotes+voter.PARTY_AFFILIATION,
-                        zIndex: 1001 + (index % 3),
-                        labelStyle: {opacity: 1},
-                        position: {
-                            lat: voter.geometry.location.lat,
-                            lng: voter.geometry.location.lng
-                            }
-                        };
-                  this.markers.push(marker );
-                // this.places.push(this.currentPlace);
+              var iconurl='http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+              this.voters.forEach( (voter ) => {
+                    //console.log('setting markers on voter='+ JSON.stringify(voter, null, 3));
+                    var index = this.voters.indexOf(voter);
+                    if (voter.PARTY_AFFILIATION == 'R') {
+                        iconurl = this.redURL;
+                    } if (voter.PARTY_AFFILIATION == 'D') {
+                        iconurl = this.blueURL;
+                    } else {
+                        iconurl = this.greenURL;
+                    }
+                    const marker = {
+                            title: voter.LAST_NAME+ voter.RESIDENTIAL_ADDRESS1,
+                            label: {text:voter.LAST_NAME+','+voter.totalVotes+voter.PARTY_AFFILIATION, fontSize:'10px'},
+                            zIndex: 1001 + (index % 3),
+                            labelStyle: {opacity: 1},
+                            icon: {url: iconurl},
+                            position: {
+                                lat: voter.geometry.location.lat,
+                                lng: voter.geometry.location.lng
+                                }
+                            };
+                      this.markers.push(marker );
+                    // this.places.push(this.currentPlace);
               });
           
           //end of happy path... 
