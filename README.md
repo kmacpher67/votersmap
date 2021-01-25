@@ -51,7 +51,7 @@ Inserted: 136884 rows
 
 ## Docker hell issues for containerization
 
-WARNING: Image for service smstest was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+WARNING: Image for service smstest was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `ls `.
 
 docker build -t smstext_smstest:latest .
 
