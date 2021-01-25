@@ -25,7 +25,9 @@ services:
       - GOOGLE_MAP_KEY:"${GOOGLE_MAP_KEY}"
       - MONGODB_URI:"mongodb://mongodb:27017/test"
     volumes:
-      - ./:/usr/src/app
+      - ./usermap/dist:/app/usermap/dist
+      - ./dist:/dist
+      - ./src:/src
     networks:
       - kennet
     restart: always
