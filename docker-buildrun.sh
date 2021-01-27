@@ -8,7 +8,10 @@ echo "Hello World bash startup for smstext maps $now"
 # npm run start
 
 echo "must have export GOOGLE_MAP_KEY = $GOOGLE_MAP_KEY"
-if [ -z ${GOOGLE_MAP_KEY} ]; then echo "GOOGLE_MAP_KEY is unset, export GOOGLE_MAP_KEY="; exit 1;; 
+if [ -z ${GOOGLE_MAP_KEY} ]; 
+    then 
+    echo "GOOGLE_MAP_KEY is unset, export GOOGLE_MAP_KEY= "
+    exit 1;
 
 docker-compose up --build -d 
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/* 
@@ -23,3 +26,5 @@ npm run build
 docker container restart $(docker inspect --format="{{.Id}}" votersmap_smstest_1)
 docker container ls
 docker container restart 
+
+exit 0
