@@ -12,7 +12,7 @@ if [ -z ${GOOGLE_MAP_KEY} ];
     then 
     echo "GOOGLE_MAP_KEY is unset, export GOOGLE_MAP_KEY= "
     exit 1;
-
+fi
 docker-compose up --build -d 
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/* 
 # sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/App.vue 
