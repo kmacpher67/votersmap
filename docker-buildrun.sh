@@ -32,13 +32,15 @@ fi
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/*.js 
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/App.vue 
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/js/* 
+
+echo "cd usermap npm run build vuejs app"
 cd usermap
 npm run build
 cd ..
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/js/*
 npm run build
 ## docker inspect --format="{{.Id}}" votersmap_smstest_1
-docker container restart $(docker inspect --format="{{.Id}}" votersmap_smstest_1)
+docker container restart $(docker inspect --format="{{.Id}}" smstext_smstest_1)
 sleep 2
 docker container ls
 

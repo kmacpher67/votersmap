@@ -7,8 +7,10 @@ WORKDIR /app
 COPY ./package.json ./
 # RUN npm install --only=production
 
-RUN rm -f package-lock.json
+RUN rm -f usermap/package-lock.json
 RUN /usr/local/bin/npm install
+
+RUN npm install -g @vue/cli
 
 COPY ./*.js* ./
 COPY ./src ./src
@@ -21,7 +23,6 @@ RUN /usr/local/bin/npm run build
 # COPY front end web code 
 COPY ./usermap/ ./usermap/
 
-RUN npm install -g @vue/cli
 
 RUN rm -f usermap/package-lock.json
 RUN cd usermap; npm install; npm run build
