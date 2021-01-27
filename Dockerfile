@@ -10,7 +10,12 @@ COPY ./package.json ./
 RUN rm -f usermap/package-lock.json
 RUN /usr/local/bin/npm install
 
-RUN npm install -g @vue/cli
+RUN "echo npm install -g @vue/cli"
+RUN /usr/local/bin/npm install -g @vue/cli
+
+RUN "/usr/local/bin/npm i -g @nestjs/cli"
+# RUN npm install
+RUN /usr/local/bin/npm i -g @nestjs/cli
 
 COPY ./*.js* ./
 COPY ./src ./src
@@ -23,18 +28,18 @@ RUN /usr/local/bin/npm run build
 # COPY front end web code 
 COPY ./usermap/ ./usermap/
 
-
+RUN echo "build vuesj dist production of voter UI app: cd usermap; npm install; npm run build"
 RUN rm -f usermap/package-lock.json
 RUN cd usermap; npm install; npm run build
 RUN cd -
+
 RUN echo "the var GOOGLE_MAPS_API_KEY should be set "; [ -z "$var" ] && echo "Empty"
 RUN sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/App.vue
 RUN sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/main.js 
 RUN sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/js/* 
 
 
-# RUN npm install
-RUN /usr/local/bin/npm i -g @nestjs/cli
+
 
 # RUN nest -v 
 # RUN npm run start:dev
