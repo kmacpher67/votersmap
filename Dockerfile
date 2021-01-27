@@ -6,6 +6,8 @@ WORKDIR /app
 
 COPY ./package.json ./
 # RUN npm install --only=production
+
+RUN rm -f package-lock.json
 RUN /usr/local/bin/npm install
 
 COPY ./*.js* ./
@@ -20,6 +22,8 @@ RUN /usr/local/bin/npm run build
 COPY ./usermap/ ./usermap/
 
 RUN npm install -g @vue/cli
+
+RUN rm -f usermap/package-lock.json
 RUN cd usermap; npm install; npm run build
 RUN cd -
 RUN echo "the var GOOGLE_MAPS_API_KEY should be set "; [ -z "$var" ] && echo "Empty"

@@ -25,7 +25,7 @@ export vm_container=$(docker inspect --format="{{.Id}}" votersmap_smstest_1);
 echo "vm_container = $vm_container"
 if [ -z "$(docker inspect --format="{{.Id}}" votersmap_smstest_1)" ]; 
     then 
-    echo "container $vm_container doesn't exist starting up docker compose ";
+    echo "container $vm_container doesn't exist starting ....:   docker-compose up --build -d  ";
     docker-compose up --build -d 
 fi
 
