@@ -7,15 +7,18 @@
         </gmap-autocomplete> -->
         <!-- <button @click="addMarker">Add</button>
       </label> -->
-
-        <select class="wardSelected" @change="getPrecints($event)">
+        <!-- <select class="wardSelected" @change="getPrecints($event)">
           <option value="WARREN-WARD 5">WARREN-WARD 5</option>
           <option v-for="ward in wards" :value="ward" :key="ward">{{ ward }}</option>
-        </select>
+        </select> -->
+
         <select class="precinctSelected" v-model="precinctSelected" @change="precinctChange($event)">
           <option selected: value="WARREN CITY 5K" >WARREN CITY 5K</option>
           <option v-for="precint in precincts" :value="precint" :key="precint">{{ precint }}</option>
         </select>
+      <label>
+        <button @click="partyAffliationFilter" v-b-tooltip.hover title="Filter vote totals by party voter count T,D,M,R">{{partyAffliation}}</button>
+      </label>
       <label>
         <button @click="incrementScore" v-b-tooltip.hover title="totalScore Limit">{{scoreLimit}}</button>
       </label>
@@ -40,8 +43,14 @@
           :title="m.title"
           :icon="m.icon"
           :zIndex="m.zIndex"
-          @click="center=m.position"
+          :clickable="true" @click="toggleInfoWindow(m,i)"
         ></gmap-marker>
+          <gmap-info-window 
+          :options="infoOptions" 
+          :position="infoWindowPos" 
+          :opened="infoWinOpen" 
+          @closeclick="infoWinOpen=false">
+        </gmap-info-window>        
     </gmap-map>
   </div>
 </template>
@@ -65,10 +74,22 @@ export default {
       zoom:14,
       precinctSelected:"WARREN CITY 5K",
       wardSelected:"WARREN-WARD 5",
-      scoreLimit:5,
+      partyAffliation:"M",
+      scoreLimit:1,
       blueURL:"http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
       redURL:"http://maps.google.com/mapfiles/ms/icons/red-dot.png",
       greenURL:"http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+      infoWindowPos: null,
+      infoWinOpen: false,
+      currentMidx: null,
+          infoOptions: {
+            content: '',
+                //optional: offset infowindow so it visually sits nicely on top of our marker
+                pixelOffset: {
+                  width: 0,
+                  height: -35
+              }
+          },
       currentPlace: null
     };
   },
@@ -105,6 +126,22 @@ export default {
     centerPage(positionLatLng) {
         console.log(' enterPage(positionLatLng)=' + positionLatLng);
         this.center = positionLatLng;
+    },
+    toggleInfoWindow: function(marker, idx) {
+        console.log('toggleInfoWindow: function(marker, idx) {' + marker + idx);
+            this.infoWindowPos = marker.position;
+            this.infoOptions.content = marker.infoText;
+
+            //check if its the same marker that was selected if yes toggle
+            if (this.currentMidx == idx) {
+              this.infoWinOpen = !this.infoWinOpen;
+            }
+            //if different marker set infowindow to open and reset current marker index
+            else {
+              this.infoWinOpen = true;
+              this.currentMidx = idx;
+
+            }
     },
     addMarker() {
       if (this.currentPlace) {
@@ -167,8 +204,22 @@ export default {
       console.log('precinctChange(events) { -- targetUrl=' + targetUrl);
 
     },
+    partyAffliationFilter() {
+      console.log('partyAffliationFilter() { = ' + this.partyAffliation);
+
+      if (this.partyAffliation == 'T' ) {
+        this.partyAffliation = 'D'
+      } else if (this.partyAffliation == 'D'){
+        this.partyAffliation = 'M'
+      } else if (this.partyAffliation == 'M'){
+        this.partyAffliation = 'R'
+      } else {
+        this.partyAffliation = 'T'
+      }
+      this.placeMarkers();
+    },
     getVoters() {
-      var targetUrl='/getprecinctByScore/WARREN%20CITY%205K/'+this.scoreLimit;
+      var targetUrl='/getprecinctByScore/'+this.precinctSelected+'/'+this.scoreLimit;
       console.log('getVoters() -- targetUrl=' + targetUrl);
       this.axios.get(targetUrl).then(response => {
               console.log(response.data);
@@ -180,46 +231,77 @@ export default {
                   lng: this.voters[0].geometry.location.lng
                 };
               }
-              this.markers = [];
-              var iconurl='http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-              this.voters.forEach( (voter ) => {
-                    //console.log('setting markers on voter='+ JSON.stringify(voter, null, 3));
-                    var index = this.voters.indexOf(voter);
-                    if (voter.PARTY_AFFILIATION == 'R') {
-                        iconurl = this.redURL;
-                    } if (voter.PARTY_AFFILIATION == 'D') {
-                        iconurl = this.blueURL;
-                    } else {
-                        iconurl = this.greenURL;
-                    }
-                    const marker = {
-                            title: voter.LAST_NAME+ voter.RESIDENTIAL_ADDRESS1,
-                            label: {text:voter.LAST_NAME+'~'+voter.totalVotes+voter.PARTY_AFFILIATION, fontSize:'9px', labelStyle: {opacity: 1}},
-                            zIndex: 100001 + (index % 3),
-                            icon: {
-                                url: iconurl,
-                                strokeColor: '#000000',
-                                strokeWeight: 1,
-                                scale: 2,
-                            },
-                            position: {
-                                lat: voter.geometry.location.lat,
-                                lng: voter.geometry.location.lng
-                                }
-                            };
-                      this.markers.push(marker);
-                    // this.places.push(this.currentPlace);
-              });
-          
+             this.placeMarkers();
           //end of happy path... 
           }).catch(function (error) {
                 // handle error
-                console.log(error);
+                console.error(error);
                 //Default value for error block
-                console.log(error);
-                this.voters = [{"_id":"600adb4cad4ca1e0eeeba965","SOS_VOTERID":"OH0015769681","COUNTY_NUMBER":"78","COUNTY_ID":"26999","LAST_NAME":"PATSY","FIRST_NAME":"HOLLY","MIDDLE_NAME":"ELAINE","SUFFIX":"","DATE_OF_BIRTH":"1956-10-11","REGISTRATION_DATE":"1988-05-11","VOTER_STATUS":"ACTIVE","PARTY_AFFILIATION":"D","RESIDENTIAL_ADDRESS1":"2415 PARKWOOD DR NW","RESIDENTIAL_SECONDARY_ADDR":"","RESIDENTIAL_CITY":"WARREN","RESIDENTIAL_STATE":"OH","RESIDENTIAL_ZIP":"44485","RESIDENTIAL_ZIP_PLUS4":"","RESIDENTIAL_COUNTRY":"","RESIDENTIAL_POSTALCODE":"","MAILING_ADDRESS1":"","MAILING_SECONDARY_ADDRESS":"","MAILING_CITY":"","MAILING_STATE":"","MAILING_ZIP":"","MAILING_ZIP_PLUS4":"","MAILING_COUNTRY":"","MAILING_POSTAL_CODE":"","CAREER_CENTER":"TRUMBULL CAREER & TECH CENTER","CITY":"WARREN CITY","CITY_SCHOOL_DISTRICT":"WARREN CITY SD","COUNTY_COURT_DISTRICT":"","CONGRESSIONAL_DISTRICT":"13","COURT_OF_APPEALS":"11","EDU_SERVICE_CENTER_DISTRICT":"","EXEMPTED_VILL_SCHOOL_DISTRICT":"","LIBRARY":"","LOCAL_SCHOOL_DISTRICT":"","MUNICIPAL_COURT_DISTRICT":"WARREN","PRECINCT_NAME":"WARREN CITY 7C","PRECINCT_CODE":"78-P-AEK","STATE_BOARD_OF_EDUCATION":"07","STATE_REPRESENTATIVE_DISTRICT":"64","STATE_SENATE_DISTRICT":"32","TOWNSHIP":"","VILLAGE":"","WARD":"WARREN-WARD 7","PRIMARY-03/07/2000":"X","GENERAL-11/07/2000":"X","SPECIAL-05/08/2001":"X","GENERAL-11/06/2001":"X","PRIMARY-05/07/2002":"X","GENERAL-11/05/2002":"X","SPECIAL-05/06/2003":"X","GENERAL-11/04/2003":"X","PRIMARY-03/02/2004":"X","GENERAL-11/02/2004":"X","SPECIAL-02/08/2005":"","PRIMARY-05/03/2005":"","PRIMARY-09/13/2005":"","GENERAL-11/08/2005":"X","SPECIAL-02/07/2006":"","PRIMARY-05/02/2006":"X","GENERAL-11/07/2006":"X","PRIMARY-05/08/2007":"","PRIMARY-09/11/2007":"","GENERAL-11/06/2007":"X","PRIMARY-11/06/2007":"","GENERAL-12/11/2007":"","PRIMARY-03/04/2008":"D","PRIMARY-10/14/2008":"","GENERAL-11/04/2008":"X","GENERAL-11/18/2008":"","PRIMARY-05/05/2009":"","PRIMARY-09/08/2009":"","PRIMARY-09/15/2009":"","PRIMARY-09/29/2009":"","GENERAL-11/03/2009":"X","PRIMARY-05/04/2010":"D","PRIMARY-07/13/2010":"","PRIMARY-09/07/2010":"","GENERAL-11/02/2010":"X","PRIMARY-05/03/2011":"D","PRIMARY-09/13/2011":"","GENERAL-11/08/2011":"X","PRIMARY-03/06/2012":"D","GENERAL-11/06/2012":"X","PRIMARY-05/07/2013":"","PRIMARY-09/10/2013":"","PRIMARY-10/01/2013":"","GENERAL-11/05/2013":"","PRIMARY-05/06/2014":"D","GENERAL-11/04/2014":"X","PRIMARY-05/05/2015":"D","PRIMARY-09/15/2015":"","GENERAL-11/03/2015":"X","PRIMARY-03/15/2016":"D","GENERAL-06/07/2016":"","PRIMARY-09/13/2016":"","GENERAL-11/08/2016":"X","PRIMARY-05/02/2017":"","PRIMARY-09/12/2017":"","GENERAL-11/07/2017":"X","PRIMARY-05/08/2018":"D","GENERAL-08/07/2018":"","GENERAL-11/06/2018":"X","PRIMARY-05/07/2019":"D","PRIMARY-09/10/2019":"","GENERAL-11/05/2019":"X","PRIMARY-03/17/2020":"D","GENERAL-11/03/2020":""}];
+                //this.voters = [{"_id":"600adb4cad4ca1e0eeeba965","SOS_VOTERID":"OH0015769681","COUNTY_NUMBER":"78","COUNTY_ID":"26999","LAST_NAME":"PATSY","FIRST_NAME":"HOLLY","MIDDLE_NAME":"ELAINE","SUFFIX":"","DATE_OF_BIRTH":"1956-10-11","REGISTRATION_DATE":"1988-05-11","VOTER_STATUS":"ACTIVE","PARTY_AFFILIATION":"D","RESIDENTIAL_ADDRESS1":"2415 PARKWOOD DR NW","RESIDENTIAL_SECONDARY_ADDR":"","RESIDENTIAL_CITY":"WARREN","RESIDENTIAL_STATE":"OH","RESIDENTIAL_ZIP":"44485","RESIDENTIAL_ZIP_PLUS4":"","RESIDENTIAL_COUNTRY":"","RESIDENTIAL_POSTALCODE":"","MAILING_ADDRESS1":"","MAILING_SECONDARY_ADDRESS":"","MAILING_CITY":"","MAILING_STATE":"","MAILING_ZIP":"","MAILING_ZIP_PLUS4":"","MAILING_COUNTRY":"","MAILING_POSTAL_CODE":"","CAREER_CENTER":"TRUMBULL CAREER & TECH CENTER","CITY":"WARREN CITY","CITY_SCHOOL_DISTRICT":"WARREN CITY SD","COUNTY_COURT_DISTRICT":"","CONGRESSIONAL_DISTRICT":"13","COURT_OF_APPEALS":"11","EDU_SERVICE_CENTER_DISTRICT":"","EXEMPTED_VILL_SCHOOL_DISTRICT":"","LIBRARY":"","LOCAL_SCHOOL_DISTRICT":"","MUNICIPAL_COURT_DISTRICT":"WARREN","PRECINCT_NAME":"WARREN CITY 7C","PRECINCT_CODE":"78-P-AEK","STATE_BOARD_OF_EDUCATION":"07","STATE_REPRESENTATIVE_DISTRICT":"64","STATE_SENATE_DISTRICT":"32","TOWNSHIP":"","VILLAGE":"","WARD":"WARREN-WARD 7","PRIMARY-03/07/2000":"X","GENERAL-11/07/2000":"X","SPECIAL-05/08/2001":"X","GENERAL-11/06/2001":"X","PRIMARY-05/07/2002":"X","GENERAL-11/05/2002":"X","SPECIAL-05/06/2003":"X","GENERAL-11/04/2003":"X","PRIMARY-03/02/2004":"X","GENERAL-11/02/2004":"X","SPECIAL-02/08/2005":"","PRIMARY-05/03/2005":"","PRIMARY-09/13/2005":"","GENERAL-11/08/2005":"X","SPECIAL-02/07/2006":"","PRIMARY-05/02/2006":"X","GENERAL-11/07/2006":"X","PRIMARY-05/08/2007":"","PRIMARY-09/11/2007":"","GENERAL-11/06/2007":"X","PRIMARY-11/06/2007":"","GENERAL-12/11/2007":"","PRIMARY-03/04/2008":"D","PRIMARY-10/14/2008":"","GENERAL-11/04/2008":"X","GENERAL-11/18/2008":"","PRIMARY-05/05/2009":"","PRIMARY-09/08/2009":"","PRIMARY-09/15/2009":"","PRIMARY-09/29/2009":"","GENERAL-11/03/2009":"X","PRIMARY-05/04/2010":"D","PRIMARY-07/13/2010":"","PRIMARY-09/07/2010":"","GENERAL-11/02/2010":"X","PRIMARY-05/03/2011":"D","PRIMARY-09/13/2011":"","GENERAL-11/08/2011":"X","PRIMARY-03/06/2012":"D","GENERAL-11/06/2012":"X","PRIMARY-05/07/2013":"","PRIMARY-09/10/2013":"","PRIMARY-10/01/2013":"","GENERAL-11/05/2013":"","PRIMARY-05/06/2014":"D","GENERAL-11/04/2014":"X","PRIMARY-05/05/2015":"D","PRIMARY-09/15/2015":"","GENERAL-11/03/2015":"X","PRIMARY-03/15/2016":"D","GENERAL-06/07/2016":"","PRIMARY-09/13/2016":"","GENERAL-11/08/2016":"X","PRIMARY-05/02/2017":"","PRIMARY-09/12/2017":"","GENERAL-11/07/2017":"X","PRIMARY-05/08/2018":"D","GENERAL-08/07/2018":"","GENERAL-11/06/2018":"X","PRIMARY-05/07/2019":"D","PRIMARY-09/10/2019":"","GENERAL-11/05/2019":"X","PRIMARY-03/17/2020":"D","GENERAL-11/03/2020":""}];
               });
-      },
+    },
+    setMarkerIconUrl (voter) {
+      console.log('setMarkerIcon (voter) { voter');
+      var iconurl='http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+      if (voter.PARTY_AFFILIATION == 'R') {
+          iconurl = this.redURL
+      } else if (voter.PARTY_AFFILIATION == 'D') {
+          iconurl = this.blueURL;
+      } else {
+          iconurl = this.greenURL;
+      }
+    return iconurl;
+    },
+    placeMarkers() {
+      console.log('placeMarkers() scoreLimit={' + this.scoreLimit + ' this.partyAffliation=' + this.partyAffliation);
+      this.markers = [];
+        this.voters.forEach( (voter ) => {
+                //console.log('setting markers on voter='+ JSON.stringify(voter, null, 3));
+            var index = this.voters.indexOf(voter);
+            //if (this.partyAffliation == voter.PARTY_AFFILIATION) {this.setVoterMarker(voter, index); } 
+            if (this.partyAffliation == 'R' ) {
+              //console.log('this.partyAffliation = ' + this.partyAffliation + voter.muniVotes + voter.PARTY_AFFILIATION + (this.partyAffliation == 'D' && voter.PARTY_AFFILIATION != 'D'));
+              if (voter.repVotes >=this.scoreLimit ) {this.setVoterMarker(voter, index);}
+            }
+            if (this.partyAffliation == 'D' ) {
+              //console.log('this.partyAffliation = ' + this.partyAffliation + voter.muniVotes + voter.PARTY_AFFILIATION + (this.partyAffliation == 'D' && voter.PARTY_AFFILIATION != 'D'));
+              if (voter.demVotes >=this.scoreLimit ) {this.setVoterMarker(voter, index);}
+            }
+            if (this.partyAffliation == 'M') {
+              console.log('this.partyAffliation = ' + this.partyAffliation + voter.muniVotes + voter.PARTY_AFFILIATION + (this.partyAffliation == 'D' && voter.PARTY_AFFILIATION != 'D'));
+              if (voter.muniVotes >0 ) {this.setVoterMarker(voter, index);}
+            }
+            if (this.partyAffliation == 'T' ) {
+              if (voter.totalVotes>=this.scoreLimit) {
+                this.setVoterMarker(voter, index);
+              }
+            }
+          });
+    },
+    setVoterMarker(voter, index) {
+          var iconurl='http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+          iconurl = this.setMarkerIconUrl(voter);
+          var infoText = voter;
+          delete infoText.geometry.bounds;
+          delete infoText.geometry.viewport;
+          const marker = {
+                  title: voter.LAST_NAME+ voter.RESIDENTIAL_ADDRESS1,
+                  label: {text:voter.LAST_NAME+'~'+voter.totalVotes+voter.PARTY_AFFILIATION, fontSize:'9px', labelStyle: {opacity: 1}},
+                  zIndex: 100001 + (index % 3),
+                  infoText: JSON.stringify(infoText),
+                  icon: {
+                      url: iconurl,
+                      strokeColor: '#000000',
+                      strokeWeight: 1,
+                      scale: 2,
+                  },
+                  position: {
+                      lat: voter.geometry.location.lat,
+                      lng: voter.geometry.location.lng
+                      }
+                  };
+            this.markers.push(marker); // this.places.push(this.currentPlace);
+    },
     getUser() {
       console.log('getUser() ')
       this.users = this.setDefaultUsers();
