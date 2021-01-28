@@ -31,8 +31,8 @@ fi
 
 echo "starting sed commands ... "
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/*.js 
-sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/App.vue 
-sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/js/* 
+#sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/App.vue 
+#sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/js/* 
 
 echo "cd usermap npm run build vuejs app"
 cd usermap
@@ -41,16 +41,6 @@ cd ..
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/js/*
 
 echo "starting docker container restart"
-# npm run build
-## docker inspect --format="{{.Id}}" votersmap_smstest_1
-# echo "container exists? == $containerid"
-# if [ -z "containerid" ]; 
-#     then 
-#     echo "container $vm_container doesn't exist starting ....:   docker-compose up -d  ";
-#     docker-compose up -d
-# fi
-#export containerid=$(docker inspect --format="{{.Id}}" smstext_smstest_1)
-
 export b=$(basename "$PWD")"_smstest_1"
 echo $b
 export containerid=$(docker inspect --format="{{.Id}}" $b)
@@ -59,8 +49,8 @@ docker container restart $containerid
 sleep 1
 docker logs $containerid
 docker container ls
-sleep 10
+sleep 15
 docker logs $containerid
-docker exec -it $containerid /bin/bash -c "ps -ef";
+docker exec -it $containerid /bin/bash -c "ls -ltr usermap/dist";
 
 exit 0

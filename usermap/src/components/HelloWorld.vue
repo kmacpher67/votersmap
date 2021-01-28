@@ -1,7 +1,6 @@
 <template>
   <div>
     <div>
-      <label>Voter Mapper Search and find.</label><br>
         <!-- <gmap-autocomplete
           @place_changed="setPlace">
         </gmap-autocomplete> -->
@@ -23,7 +22,7 @@
         <button @click="incrementScore" v-b-tooltip.hover title="totalScore Limit">{{scoreLimit}}</button>
       </label>
       <label>
-        <button @click="getVoters">voters</button>
+        <button @click="getVoters" v-b-tooltip.hover title="get new Voters query">voters</button>
       </label>
       {{markers.length}}
     </div>
@@ -33,7 +32,7 @@
       :fullscreenControl=true
       :zoomControl=true
       :streetViewControl=true
-      style="width:100%; height:660px;"
+      style="width:100%; height:690px;"
     >
         <gmap-marker
           :key="index"
@@ -52,6 +51,7 @@
           @closeclick="infoWinOpen=false">
         </gmap-info-window>        
     </gmap-map>
+      <br> <label>Voter Mapper Search and find.</label>
   </div>
 </template>
 
@@ -60,14 +60,12 @@ export default {
   name: "GoogleMap",
   data() {
     return {
-      // default to Montreal to keep it simple
-      // change this to whatever makes sense
-      // 41.238553,-80.8258473
       center: { lat: 41.238553, lng: -80.8258473 },
       markers: [],
       voters: [],
       places: [],
-      myOptionSelected: '',
+      infoOptionText: '',
+      infoOptionVoter: null,
       wards: ["WARREN-WARD 1", "WARREN-WARD 2",  "WARREN-WARD 3",  "WARREN-WARD 4",  "WARREN-WARD 5",  "WARREN-WARD 6","WARREN-WARD 7"],
       precincts: ["WARREN CITY 1A","WARREN CITY 1B","WARREN CITY 1E","WARREN CITY 1G","WARREN CITY 2C","WARREN CITY 2F","WARREN CITY 2G","WARREN CITY 3D","WARREN CITY 3G","WARREN CITY 3J","WARREN CITY 3K","WARREN CITY 3L","WARREN CITY 4A","WARREN CITY 4D","WARREN CITY 4F","WARREN CITY 5D","WARREN CITY 5E","WARREN CITY 5F","WARREN CITY 5G","WARREN CITY 5K","WARREN CITY 6B","WARREN CITY 6D","WARREN CITY 6G","WARREN CITY 7A","WARREN CITY 7C","WARREN CITY 7D"],
       users: [{name: 'kenny', position:{lat:41.238553, lng:-80.8258473}}],
@@ -87,7 +85,7 @@ export default {
                 //optional: offset infowindow so it visually sits nicely on top of our marker
                 pixelOffset: {
                   width: 0,
-                  height: -35
+                  height: -55
               }
           },
       currentPlace: null
@@ -128,9 +126,12 @@ export default {
         this.center = positionLatLng;
     },
     toggleInfoWindow: function(marker, idx) {
-        console.log('toggleInfoWindow: function(marker, idx) {' + marker + idx);
+        console.log('toggleInfoWindow: function(marker, idx) {' + JSON.stringify(marker,null,3) + idx);
             this.infoWindowPos = marker.position;
-            this.infoOptions.content = marker.infoText;
+
+            this.infoOptions.content = this.parseVoterInfoText(this.voters[marker.voterIndex]);
+
+            //this.infoOptions.content = marker.infoText;
 
             //check if its the same marker that was selected if yes toggle
             if (this.currentMidx == idx) {
@@ -268,7 +269,7 @@ export default {
               if (voter.demVotes >=this.scoreLimit ) {this.setVoterMarker(voter, index);}
             }
             if (this.partyAffliation == 'M') {
-              console.log('this.partyAffliation = ' + this.partyAffliation + voter.muniVotes + voter.PARTY_AFFILIATION + (this.partyAffliation == 'D' && voter.PARTY_AFFILIATION != 'D'));
+              // console.log('this.partyAffliation = ' + this.partyAffliation + voter.muniVotes + voter.PARTY_AFFILIATION + (this.partyAffliation == 'D' && voter.PARTY_AFFILIATION != 'D'));
               if (voter.muniVotes >0 ) {this.setVoterMarker(voter, index);}
             }
             if (this.partyAffliation == 'T' ) {
@@ -285,6 +286,8 @@ export default {
           delete infoText.geometry.bounds;
           delete infoText.geometry.viewport;
           const marker = {
+                  voterIndex: index,
+                  sosVoterID: voter.SOS_VOTERID,
                   title: voter.LAST_NAME+ voter.RESIDENTIAL_ADDRESS1,
                   label: {text:voter.LAST_NAME+'~'+voter.totalVotes+voter.PARTY_AFFILIATION, fontSize:'9px', labelStyle: {opacity: 1}},
                   zIndex: 100001 + (index % 3),
@@ -301,6 +304,42 @@ export default {
                       }
                   };
             this.markers.push(marker); // this.places.push(this.currentPlace);
+    },
+    parseVoterInfoText(voterinfo) {
+      console.log('parseVoterInfoText() {=' + voterinfo.SOS_VOTERID + voterinfo.LAST_NAME);
+      var voterInfoText = ' <form>';
+
+      voterInfoText = voterInfoText + 'Sos Voter ID:<input type="text" v-model="voterinfo.SOS_VOTERID" class="form-control" value="'+voterinfo.SOS_VOTERID + '" size="12" />  County ID';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.COUNTY_ID" value="'+voterinfo.COUNTY_ID + '" size="8"/><br/>';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.FIRST_NAME" value="'+voterinfo.FIRST_NAME + '" size="9" />';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.LAST_NAME" value="'+voterinfo.LAST_NAME + '"  size="12"/><br/>';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.RESIDENTIAL_ADDRESS1" value="'+voterinfo.RESIDENTIAL_ADDRESS1 + '" size="22"/> ';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.RESIDENTIAL_ADDRESS2" value="'+voterinfo.RESIDENTIAL_ADDRESS2 + '" size="6"/><br/>';
+      voterInfoText = voterInfoText + 'Reg Date: <input type="text" class="form-control" v-model="voterinfo.REGISTRATION_DATE" value="'+voterinfo.REGISTRATION_DATE + '" size="8"/>   Birth:';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.DATE_OF_BIRTH" value="'+voterinfo.DATE_OF_BIRTH + '"  size="8"/> <br/>';
+      voterInfoText = voterInfoText + '<textarea class="form-control" v-model="voterinfo.notes" placeholder="add multiple lines" rows="4" cols="38">'+(voterinfo.notes ||'')+'</textarea><br/>';
+      voterInfoText = voterInfoText + voterinfo.totalVotes + ' Muni='+voterinfo.muniVotes +' Dems='+voterinfo.demVotes +' Reps='+voterinfo.repVotes +' <br/>';
+      voterInfoText = voterInfoText + '<button type="submit" onclick="this.select(voterinf)"> Update Voter notes. </button>';
+      voterInfoText = voterInfoText + '</form>';
+      this.infoOptionText = voterInfoText;
+      return voterInfoText;
+    },
+    getVoter(voterRec) {
+      console.log('getVoter(voterRec) ='+ JSON.stringify(voterRec))
+      this.axios.get('/users/'+JSON.stringify(voterRec)).then(response => {
+              console.log(response.data.json);
+              this.currentVoterDetails=response.data.json;
+              return response.data.json;
+          }).catch(function (error) {
+            // handle error
+            console.log('getVoter(voterRec) { error occurred');
+            console.log(error);
+        });
+    },
+    updateVoterNotes(voterInfoUpdate) {
+      console.log('updateVoterNotes(voterInfoUpdate) {' + JSON.stringify(voterInfoUpdate, null, 3));
+
+
     },
     getUser() {
       console.log('getUser() ')
@@ -345,21 +384,6 @@ export default {
             console.log(response);
         }) 
     },
-    // addCircle(position) {
-    //     this.circle = new google.maps.Circle({
-    //         map: this.map,
-    //         center: new google.maps.LatLng(position.lat, position.lng),
-    //         radius: 2000,
-    //         strokeColor: '#00ff00',
-    //         fillColor: "#484040bf",
-    //     });
-    // },
-    // withinRegion(position, user, radius) {
-    //     const to = new google.maps.LatLng(user.position.lat, user.position.lng);
-    //     const from = new google.maps.LatLng(position.lat, position.lng);
-    //     const distance = google.maps.geometry.spherical.computeDistanceBetween(from, to);
-    //     return distance <= radius;
-    // }
   }
 };
 </script>

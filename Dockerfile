@@ -7,15 +7,17 @@ WORKDIR /app
 COPY ./package.json ./
 # RUN npm install --only=production
 
+RUN rm -f package-lock.json
 RUN rm -f usermap/package-lock.json
 RUN /usr/local/bin/npm install
 
-RUN "echo npm install -g @vue/cli"
-RUN /usr/local/bin/npm install -g @vue/cli
-
-RUN "/usr/local/bin/npm i -g @nestjs/cli"
+RUN echo "/usr/local/bin/npm install -g @nestjs/cli"
 # RUN npm install
-RUN /usr/local/bin/npm i -g @nestjs/cli
+RUN /usr/local/bin/npm install -g @nestjs/cli
+
+
+RUN echo "/usr/local/bin/npm install -g @vue/cli "
+RUN /usr/local/bin/npm install -g @vue/cli 
 
 COPY ./*.js* ./
 COPY ./src ./src
@@ -37,9 +39,6 @@ RUN echo "the var GOOGLE_MAPS_API_KEY should be set "; [ -z "$var" ] && echo "Em
 RUN sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/App.vue
 RUN sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/main.js 
 RUN sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/js/* 
-
-
-
 
 # RUN nest -v 
 # RUN npm run start:dev

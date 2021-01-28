@@ -68,7 +68,8 @@ export class AppController {
 
   @Get('warrenvoter/:voter')
   async getWarrenVoter(@Param() params): Promise<Voter[]> {
-    return this.appService.findOne(params);
+    console.log('async getWarrenVoter(@Param() params)' + JSON.stringify(params,null,3));
+    return this.appService.findVoter(params);
   }
 
   @Get('findall')

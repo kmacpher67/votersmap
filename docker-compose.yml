@@ -26,12 +26,13 @@ services:
       - MONGODB_URI:"mongodb://mongodb:27017/test"
     volumes:
       - ./usermap/dist:/app/usermap/dist
-      - ./dist:/dist
-      - ./src:/src
+      - ./dist:/app/dist
+      - ./src:/app/src
     networks:
       - kennet
     restart: always
 
+  # https://medium.com/better-programming/persistent-databases-using-dockers-volumes-and-mongodb-9ac284c25b39
   mongodb:
     container_name: mongo
     image: mongo:4.4.3
