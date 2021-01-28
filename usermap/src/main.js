@@ -13,6 +13,15 @@ console.log('vue-main.js - GOOGLE_MAP_KEY= ' + GOOGLE_MAP_KEY);
 
 // const DEFAULT_PRECINCTS = ["WARREN CITY 5K"]
 
+// Define a new component called button-counter
+Vue.component('button-counter', {
+  data: function () {
+    return {
+      count: 0
+    }
+  },
+  template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>'
+})
 
 Vue.use(VueGoogleMaps, {
   load: {

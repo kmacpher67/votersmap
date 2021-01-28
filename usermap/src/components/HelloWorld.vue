@@ -26,13 +26,16 @@
       </label>
       {{markers.length}}
     </div>
+    <div id="components-demo">
+      <button-counter></button-counter>
+    </div>
     <gmap-map
       :center="center"
       :zoom=zoom
       :fullscreenControl=true
       :zoomControl=true
       :streetViewControl=true
-      style="width:100%; height:690px;"
+      style="width:100%; height:700px;"
     >
         <gmap-marker
           :key="index"
@@ -309,17 +312,17 @@ export default {
       console.log('parseVoterInfoText() {=' + voterinfo.SOS_VOTERID + voterinfo.LAST_NAME);
       var voterInfoText = ' <form>';
 
-      voterInfoText = voterInfoText + 'Sos Voter ID:<input type="text" v-model="voterinfo.SOS_VOTERID" class="form-control" value="'+voterinfo.SOS_VOTERID + '" size="12" />  County ID';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.COUNTY_ID" value="'+voterinfo.COUNTY_ID + '" size="8"/><br/>';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.FIRST_NAME" value="'+voterinfo.FIRST_NAME + '" size="9" />';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.LAST_NAME" value="'+voterinfo.LAST_NAME + '"  size="12"/><br/>';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.RESIDENTIAL_ADDRESS1" value="'+voterinfo.RESIDENTIAL_ADDRESS1 + '" size="22"/> ';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.RESIDENTIAL_ADDRESS2" value="'+voterinfo.RESIDENTIAL_ADDRESS2 + '" size="6"/><br/>';
-      voterInfoText = voterInfoText + 'Reg Date: <input type="text" class="form-control" v-model="voterinfo.REGISTRATION_DATE" value="'+voterinfo.REGISTRATION_DATE + '" size="8"/>   Birth:';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.DATE_OF_BIRTH" value="'+voterinfo.DATE_OF_BIRTH + '"  size="8"/> <br/>';
-      voterInfoText = voterInfoText + '<textarea class="form-control" v-model="voterinfo.notes" placeholder="add multiple lines" rows="4" cols="38">'+(voterinfo.notes ||'')+'</textarea><br/>';
-      voterInfoText = voterInfoText + voterinfo.totalVotes + ' Muni='+voterinfo.muniVotes +' Dems='+voterinfo.demVotes +' Reps='+voterinfo.repVotes +' <br/>';
-      voterInfoText = voterInfoText + '<button type="submit" onclick="this.select(voterinf)"> Update Voter notes. </button>';
+      voterInfoText = voterInfoText + 'Ohio ID:<input type="text" v-model="voterinfo.SOS_VOTERID" class="form-control" value="'+voterinfo.SOS_VOTERID + '" size="11" readonly/> CountyID';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.COUNTY_ID" value="'+voterinfo.COUNTY_ID + '" size="3" readonly/><br/>';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.FIRST_NAME" value="'+voterinfo.FIRST_NAME + '" size="7" readonly/> ';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.LAST_NAME" value="'+voterinfo.LAST_NAME + '"  size="12" readonly/><br/>';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.RESIDENTIAL_ADDRESS1" value="'+voterinfo.RESIDENTIAL_ADDRESS1 + '" size="20"/> ';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.RESIDENTIAL_ADDRESS2" value="'+(voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '" size="3"/><br/>';
+      voterInfoText = voterInfoText + 'Reg Date:<input type="text" class="form-control" v-model="voterinfo.REGISTRATION_DATE" value="'+voterinfo.REGISTRATION_DATE + '" readonly size="7"/> Birth:';
+      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.DATE_OF_BIRTH" value="'+voterinfo.DATE_OF_BIRTH + '" readonly size="7"/><br/>';
+      voterInfoText = voterInfoText + '<textarea class="form-control" v-model="voterinfo.notes" placeholder="add multiple lines" rows="5" cols="30">'+(voterinfo.notes ||'')+'</textarea><br/>';
+      voterInfoText = voterInfoText + voterinfo.totalVotes + ' Muni='+voterinfo.muniVotes +' Dems='+voterinfo.demVotes +' Reps='+voterinfo.repVotes +' Party='+voterinfo.PARTY_AFFILIATION + '<br/>';
+      voterInfoText = voterInfoText + '<button onclick="this.select(voterinf)"> Update Voter notes. </button>';
       voterInfoText = voterInfoText + '</form>';
       this.infoOptionText = voterInfoText;
       return voterInfoText;
