@@ -26,9 +26,6 @@
       </label>
       {{markers.length}}
     </div>
-    <div id="components-demo">
-      <button-counter></button-counter>
-    </div>
     <gmap-map
       :center="center"
       :zoom=zoom
@@ -52,6 +49,8 @@
           :position="infoWindowPos" 
           :opened="infoWinOpen" 
           @closeclick="infoWinOpen=false">
+            <div id="gmap-info-window-form">
+            </div>
         </gmap-info-window>        
     </gmap-map>
       <br> <label>Voter Mapper Search and find.</label>
@@ -131,8 +130,23 @@ export default {
     toggleInfoWindow: function(marker, idx) {
         console.log('toggleInfoWindow: function(marker, idx) {' + JSON.stringify(marker,null,3) + idx);
             this.infoWindowPos = marker.position;
+            this.infoOptions.content='';
 
-            this.infoOptions.content = this.parseVoterInfoText(this.voters[marker.voterIndex]);
+            // should we be checking voters and adding them as additional markers
+            var allAddresses = this.markers.filter(function(item) {
+                return item.RESIDENTIAL_ADDRESS1 == marker.RESIDENTIAL_ADDRESS1;
+            });
+            console.log('markers filtered for allAddresses =' + allAddresses );
+
+            var locInfoAddresses = this.findOtherAddresses(this.voters[marker.voterIndex]);
+
+            locInfoAddresses.forEach(element => {
+              console.log(element);
+              this.infoOptions.content = this.infoOptions.content + this.parseVoterInfoText(element);
+            });
+            this.infoOptions.content='<div id="voterInfoDetails" class="infopage">'+this.infoOptions.content;
+            this.infoOptions.content= this.infoOptions.content+'</div><button onclick="console.log(this);window.getSelection().removeAllRanges(); var range = document.createRange(); range.selectNode(document.getElementById(\'voterInfoDetails\'));window.getSelection().addRange(range);document.execCommand(\'copy\');">Copy to Clipboard</button> ';
+
 
             //this.infoOptions.content = marker.infoText;
 
@@ -273,7 +287,7 @@ export default {
             }
             if (this.partyAffliation == 'M') {
               // console.log('this.partyAffliation = ' + this.partyAffliation + voter.muniVotes + voter.PARTY_AFFILIATION + (this.partyAffliation == 'D' && voter.PARTY_AFFILIATION != 'D'));
-              if (voter.muniVotes >0 ) {this.setVoterMarker(voter, index);}
+              if (voter.muniVotes >= this.scoreLimit ) {this.setVoterMarker(voter, index);}
             }
             if (this.partyAffliation == 'T' ) {
               if (voter.totalVotes>=this.scoreLimit) {
@@ -306,26 +320,48 @@ export default {
                       lng: voter.geometry.location.lng
                       }
                   };
-            this.markers.push(marker); // this.places.push(this.currentPlace);
+            if (this.markers>501) {
+              console.log('MARKERS LIMIT !!! - if (this.markers>501) {');
+            } else {
+              this.markers.push(marker); // this.places.push(this.currentPlace);
+            }
+            
+    },
+    findOtherAddresses(targetVoter) {
+      console.log(' findOtherAddresses(targetVoter) {=' + targetVoter.RESIDENTIAL_ADDRESS1);
+      
+      var votersAtAddress = this.voters.filter(function (el) {
+          return el.RESIDENTIAL_ADDRESS1 == targetVoter.RESIDENTIAL_ADDRESS1;
+        });
+
+      console.log('votersatadress = ' + JSON.stringify(votersAtAddress,null,3));
+      return votersAtAddress;
     },
     parseVoterInfoText(voterinfo) {
       console.log('parseVoterInfoText() {=' + voterinfo.SOS_VOTERID + voterinfo.LAST_NAME);
-      var voterInfoText = ' <form>';
 
-      voterInfoText = voterInfoText + 'Ohio ID:<input type="text" v-model="voterinfo.SOS_VOTERID" class="form-control" value="'+voterinfo.SOS_VOTERID + '" size="11" readonly/> CountyID';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.COUNTY_ID" value="'+voterinfo.COUNTY_ID + '" size="3" readonly/><br/>';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.FIRST_NAME" value="'+voterinfo.FIRST_NAME + '" size="7" readonly/> ';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.LAST_NAME" value="'+voterinfo.LAST_NAME + '"  size="12" readonly/><br/>';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.RESIDENTIAL_ADDRESS1" value="'+voterinfo.RESIDENTIAL_ADDRESS1 + '" size="20"/> ';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.RESIDENTIAL_ADDRESS2" value="'+(voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '" size="3"/><br/>';
-      voterInfoText = voterInfoText + 'Reg Date:<input type="text" class="form-control" v-model="voterinfo.REGISTRATION_DATE" value="'+voterinfo.REGISTRATION_DATE + '" readonly size="7"/> Birth:';
-      voterInfoText = voterInfoText + '<input type="text" class="form-control" v-model="voterinfo.DATE_OF_BIRTH" value="'+voterinfo.DATE_OF_BIRTH + '" readonly size="7"/><br/>';
-      voterInfoText = voterInfoText + '<textarea class="form-control" v-model="voterinfo.notes" placeholder="add multiple lines" rows="5" cols="30">'+(voterinfo.notes ||'')+'</textarea><br/>';
-      voterInfoText = voterInfoText + voterinfo.totalVotes + ' Muni='+voterinfo.muniVotes +' Dems='+voterinfo.demVotes +' Reps='+voterinfo.repVotes +' Party='+voterinfo.PARTY_AFFILIATION + '<br/>';
-      voterInfoText = voterInfoText + '<button onclick="this.select(voterinf)"> Update Voter notes. </button>';
-      voterInfoText = voterInfoText + '</form>';
+      var voterInfoText = '<label>OhioID:'+ voterinfo.SOS_VOTERID + ' </label>';
+      voterInfoText = voterInfoText + '<label> CountyID:'+ voterinfo.COUNTY_ID + '</label><br/>';
+      voterInfoText = voterInfoText + '<label>'+ voterinfo.FIRST_NAME + ' </label> ';
+      voterInfoText = voterInfoText + '<label> '+ voterinfo.LAST_NAME + ' </label><br/>';
+      voterInfoText = voterInfoText + '<label>'+ voterinfo.RESIDENTIAL_ADDRESS1 + ' </label>';
+      voterInfoText = voterInfoText + '<label>  '+ (voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '</label><br/>';
+      voterInfoText = voterInfoText + '<label>  '+ (voterinfo.PRECINCT_NAME ||'') + '</label><br/>';
+      voterInfoText = voterInfoText + '<label>Reg:'+voterinfo.REGISTRATION_DATE + '</label>,';
+      voterInfoText = voterInfoText + '<label>Birth:'+voterinfo.DATE_OF_BIRTH + '</label><br/>';
+      // voterInfoText = voterInfoText + '<textarea class="form-control" v-model="voterinfo.notes" placeholder="add multiple lines" rows="5" cols="30">'+(voterinfo.notes ||'')+'</textarea><br/>';
+      voterInfoText = voterInfoText + ' Total Votes='+voterinfo.totalVotes + ' Muni='+voterinfo.muniVotes +' Dems='+voterinfo.demVotes +' Reps='+voterinfo.repVotes +' Party='+voterinfo.PARTY_AFFILIATION + '<br/>';
+      voterInfoText = voterInfoText + '<br/>';
+
       this.infoOptionText = voterInfoText;
       return voterInfoText;
+    },
+    selectCopy(containerid) {
+      console.log('selectCopy(containerid) { = ' + containerid);
+      var range = document.createRange();
+      range.selectNode(document.getElementById(containerid));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
     },
     getVoter(voterRec) {
       console.log('getVoter(voterRec) ='+ JSON.stringify(voterRec))
@@ -390,3 +426,10 @@ export default {
   }
 };
 </script>
+
+<style>
+  .infopage {
+    font-size:larger;
+  }
+    
+</style>

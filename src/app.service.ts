@@ -35,7 +35,7 @@ export class AppService {
     return this.voterModel.find(voter).exec();
   }
 
-  voterSummaryProjection = {"SOS_VOTERID":1, "COUNTY_ID":1, "LAST_NAME":1, "FIRST_NAME":1, "DATE_OF_BIRTH":1, "REGISTRATION_DATE": 1, "RESIDENTIAL_ADDRESS1":1, "RESIDENTIAL_ADDRESS2":1, "PARTY_AFFILIATION":1, "totalVotes":1, "demVotes":1, "repVotes":1, "muniVotes":1, "geometry.$":1 };
+  voterSummaryProjection = {"SOS_VOTERID":1, "COUNTY_ID":1, "LAST_NAME":1, "FIRST_NAME":1, "DATE_OF_BIRTH":1, "REGISTRATION_DATE": 1, "RESIDENTIAL_ADDRESS1":1, "RESIDENTIAL_ADDRESS2":1, "PARTY_AFFILIATION":1, "PRECINCT_NAME":1, "totalVotes":1, "demVotes":1, "repVotes":1, "muniVotes":1, "geometry.$":1 };
 
   async findWard(voterQuery): Promise<Voter[]> {
     console.log('findWard(ward)=' + JSON.stringify(voterQuery, null, 3));
