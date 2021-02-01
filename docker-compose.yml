@@ -38,8 +38,10 @@ services:
     image: mongo:4.4.3
     environment:
       - MONGO_INITDB_DATABASE=test
-    ports:
-      - 27017:27017
+    expose: 
+      - 27017
+#    ports:
+#      - 27017:27017
     volumes:
       - ./db:/data/db
     networks:
