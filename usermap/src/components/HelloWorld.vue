@@ -24,7 +24,7 @@
       <label>
         <button @click="getVoters" v-b-tooltip.hover title="get new Voters query">voters</button>
       </label>
-      {{markers.length}}
+      {{markers.length}} <button-counter></button-counter>
     </div>
     <gmap-map
       :center="center"
@@ -82,14 +82,14 @@ export default {
       infoWindowPos: null,
       infoWinOpen: false,
       currentMidx: null,
-          infoOptions: {
-            content: '',
-                //optional: offset infowindow so it visually sits nicely on top of our marker
-                pixelOffset: {
-                  width: 0,
-                  height: -55
-              }
-          },
+      infoOptions: {
+        content: '',
+            //optional: offset infowindow so it visually sits nicely on top of our marker
+          //   pixelOffset: {
+          //     width: 0,
+          //     height: -55
+          // }
+      },
       currentPlace: null
     };
   },
@@ -140,16 +140,19 @@ export default {
 
             var locInfoAddresses = this.findOtherAddresses(this.voters[marker.voterIndex]);
 
-            locInfoAddresses.forEach(element => {
-              console.log(element);
+            locInfoAddresses.forEach( (element, index) => {
+              console.log(element + index);
+              if (index>0) { 
+                this.infoOptions.content = this.infoOptions.content + '<br>'
+              }
+              console.log('this.infoOptions=' + this.infoOptions);
               this.infoOptions.content = this.infoOptions.content + this.parseVoterInfoText(element);
             });
-            this.infoOptions.content='<div id="voterInfoDetails" class="infopage">'+this.infoOptions.content;
+
+            this.infoOptions.content='<div id="components-demo"><button-counter></button-counter></div><div id="voterInfoDetails" class="infopage">'+this.infoOptions.content;
             this.infoOptions.content= this.infoOptions.content+'</div><button onclick="console.log(this);window.getSelection().removeAllRanges(); var range = document.createRange(); range.selectNode(document.getElementById(\'voterInfoDetails\'));window.getSelection().addRange(range);document.execCommand(\'copy\');">Copy to Clipboard</button> ';
 
-
             //this.infoOptions.content = marker.infoText;
-
             //check if its the same marker that was selected if yes toggle
             if (this.currentMidx == idx) {
               this.infoWinOpen = !this.infoWinOpen;
@@ -334,14 +337,14 @@ export default {
           return el.RESIDENTIAL_ADDRESS1 == targetVoter.RESIDENTIAL_ADDRESS1;
         });
 
-      console.log('votersatadress = ' + JSON.stringify(votersAtAddress,null,3));
+      //console.log('votersatadress = ' + JSON.stringify(votersAtAddress,null,3));
       return votersAtAddress;
     },
     parseVoterInfoText(voterinfo) {
       console.log('parseVoterInfoText() {=' + voterinfo.SOS_VOTERID + voterinfo.LAST_NAME);
 
-      var voterInfoText = '<label>OhioID:'+ voterinfo.SOS_VOTERID + ' </label>';
-      voterInfoText = voterInfoText + '<label> CountyID:'+ voterinfo.COUNTY_ID + '</label><br/>';
+      var voterInfoText = '<label>OhioID:'+ voterinfo.SOS_VOTERID + ' </label><br/>';
+      // voterInfoText = voterInfoText + '<label> CountyID:'+ voterinfo.COUNTY_ID + '</label><br/>';
       voterInfoText = voterInfoText + '<label>'+ voterinfo.FIRST_NAME + ' </label> ';
       voterInfoText = voterInfoText + '<label> '+ voterinfo.LAST_NAME + ' </label><br/>';
       voterInfoText = voterInfoText + '<label>'+ voterinfo.RESIDENTIAL_ADDRESS1 + ' </label>';
@@ -351,7 +354,7 @@ export default {
       voterInfoText = voterInfoText + '<label>Birth:'+voterinfo.DATE_OF_BIRTH + '</label><br/>';
       // voterInfoText = voterInfoText + '<textarea class="form-control" v-model="voterinfo.notes" placeholder="add multiple lines" rows="5" cols="30">'+(voterinfo.notes ||'')+'</textarea><br/>';
       voterInfoText = voterInfoText + ' Total Votes='+voterinfo.totalVotes + ' Muni='+voterinfo.muniVotes +' Dems='+voterinfo.demVotes +' Reps='+voterinfo.repVotes +' Party='+voterinfo.PARTY_AFFILIATION + '<br/>';
-      voterInfoText = voterInfoText + '<br/>';
+      // voterInfoText = voterInfoText + '<br/>';
 
       this.infoOptionText = voterInfoText;
       return voterInfoText;
