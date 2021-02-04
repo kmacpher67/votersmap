@@ -24,7 +24,7 @@
       <label>
         <button @click="getVoters" v-b-tooltip.hover title="get new Voters query">voters</button>
       </label>
-      {{markers.length}} <button-counter></button-counter>
+      m={{markers.length}}, tv={{voters.length}}
     </div>
     <gmap-map
       :center="center"
@@ -54,6 +54,30 @@
         </gmap-info-window>        
     </gmap-map>
       <br> <label>Voter Mapper Search and find.</label>
+      <button color="green darken-1" flat @click.native="print">Print</button>
+      <button color="green darken-1" flat @click.native="print">Print</button>
+    <div id="print"> 
+      <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Birth Date </th>
+                    <th>MuniVotes</th>
+                    <th>Details (Precinct,Party, totalVotes, Dem, Rep)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="voter in voters" :key="voter.RESIDENTIAL_ADDRESS1" style="text-align:left">
+                    <td>{{voter.LAST_NAME}}, {{voter.FIRST_NAME}} </td>
+                    <td>{{voter.RESIDENTIAL_ADDRESS1}} {{voter.RESIDENTIAL_ADDRESS2}}</td>
+                    <td>{{voter.DATE_OF_BIRTH}}</td>
+                    <td style="text-align:center">{{voter.muniVotes}}</td>
+                    <td>{{voter.PRECINCT_NAME}} {{voter.PARTY_AFFILIATION}} {{voter.totalVotes}} {{voter.demVotes}} {{voter.repVotes}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
   </div>
 </template>
 
@@ -84,11 +108,13 @@ export default {
       currentMidx: null,
       infoOptions: {
         content: '',
-            //optional: offset infowindow so it visually sits nicely on top of our marker
-          //   pixelOffset: {
-          //     width: 0,
-          //     height: -55
-          // }
+        maxWidth: 390,
+        background: 'blue',
+            // optional: offset infowindow so it visually sits nicely on top of our marker
+            pixelOffset: {
+              width: 15,
+              height: -15
+          }
       },
       currentPlace: null
     };
@@ -103,7 +129,18 @@ export default {
     this.fitBounds();
     this.getPrecincts();
   },
+  computed: {
+    filterVoters: function () {
+        console.log('computed: {filterVoters: function () {');
 
+      return this.voters.filter(function (voter) {
+        return voter.name.indexOf(self.searchQuery) !== -1
+      })
+    },
+    orderedVoters: function () {
+      return this.voters.orderBy(this.voters, 'muniVotes')
+    }
+  },
   methods: {
     // receives a place object via the autocomplete component
     setPlace(place) {
@@ -121,8 +158,16 @@ export default {
       if (this.scoreLimit>39) {
         this.scoreLimit=0;
       }
-    }
-    ,
+    },
+    print() {
+      var prtContent = document.getElementById("print");
+      var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+      WinPrint.document.write(prtContent.innerHTML);
+      WinPrint.document.close();
+      WinPrint.focus();
+      WinPrint.print();
+      WinPrint.close();
+    },
     centerPage(positionLatLng) {
         console.log(' enterPage(positionLatLng)=' + positionLatLng);
         this.center = positionLatLng;

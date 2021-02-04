@@ -11,12 +11,13 @@ async function bootstrap() {
   // For serving static files you have to use useStaticAssets() instead of setBaseViewsDir():
   console.log('main.ts - bootstrap function');
   // app.useStaticAssets(join(__dirname, '..', 'usermap/dist'))
-  // app.useStaticAssets(join(__dirname, '..', 'votemapper'))
+  //app.useStaticAssets(join(__dirname, '..', 'views'))
 
   app.setBaseViewsDir(join(__dirname, '..', 'usermap/dist'));
-  app.setBaseViewsDir('..');
+  // app.setBaseViewsDir('views');
   // app.set(join(__dirname, '..', 'usermap/dist'));
-  app.setViewEngine('ejs');  // ejs or jade or html 
+
+  app.setViewEngine('ejs');  // ejs or jade or hbs 
   app.enableCors();
 
   await app.listen(3000);
