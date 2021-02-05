@@ -247,6 +247,7 @@ export default {
       console.log('    AFTER sortVotersList: function(sortKey=) {' + sortKey);
     },
     compare( a, b, keyValue='RESIDENTIAL_ADDRESS1' ) {
+      console.log('compare( a, b, keyValue=RESIDENTIAL_ADDRESS1 ) {');
       if ( a[keyValue] < b[keyValue] ){
         return -1;
       }
