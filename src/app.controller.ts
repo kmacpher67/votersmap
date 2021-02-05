@@ -1,13 +1,20 @@
-import { Controller, Get, Header, Param, Post, Req, Res } from '@nestjs/common';
+import { Controller, Get, Header, Param, Post, Req, Res, UseGuards  } from '@nestjs/common';
 import { AppService } from './app.service';
 import { VoterService } from './voter/voter.service';
 import { Request } from 'express';
 import {Voter} from './voter/schemas/voter.schema'
 import { waitForDebugger } from 'inspector';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
+
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/login')
+  async login(@Req() req) {
+    return req.user;
+  }
 
   @Get()
       root(@Res() res) {
@@ -57,14 +64,12 @@ export class AppController {
     return this.appService.findWard(params);
   }
   
-
   @Get('getprecinctByScore/:PRECINCT_NAME/:totalVotes')
   async getprecinctByScore(@Param() params): Promise<Voter[]> {
     console.log(params);
     
     return this.appService.findWard(params);
   }
-
 
   @Get('warrenvoter/:voter')
   async getWarrenVoter(@Param() params): Promise<Voter[]> {
@@ -93,6 +98,4 @@ export class AppController {
   create(): string {
     return 'This action adds a new cat';
   }
-  
-
 }

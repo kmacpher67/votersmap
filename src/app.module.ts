@@ -14,6 +14,7 @@ import { UsersModule } from './users/users.module';
 import { Users } from './users';
 import { UsersController } from './users/users.controller';
 import { join } from 'path';
+import { AuthModule } from './auth/auth.module';
 
 
 // https://docs.nestjs.com/techniques/configuration
@@ -41,6 +42,7 @@ console.log('app.module.ts - MongooseModule mongoDBUrl=' + mongoDBUrl);
       rootPath: join(__dirname, '..', 'usermap/dist'),   // <-- path to the static files
     }),
     UsersModule,
+    AuthModule,
     ],
   controllers: [AppController, LookupController, UsersController],
   providers: [AppService, LookupaddressService, SosDbService, UsersService, Users],

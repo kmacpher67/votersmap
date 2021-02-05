@@ -48,6 +48,14 @@ Inserted: 136884 rows
 4199
 
 
+## security authentication setup
+
+https://docs.nestjs.com/security/authentication
+
+```
+curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"
+# result -> {"userId":1,"username":"john"}
+```
 
 ## Docker hell issues for containerization
 

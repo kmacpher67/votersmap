@@ -1,35 +1,40 @@
-import { Injectable  } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-const people2 = require('../users/people');
-const people = [{
-        name: 'Oluyemi', position: {lat:41.238553, lng: -80.8258473}
-    }, {name: 'kenny', position:{lat:41.23, lng:-80.815}}];
-
-// 41.2344221,-80.8154618,
+// This should be a real class/interface representing a user entity
+export type User = any;
 
 @Injectable()
-export class UsersService {    
+export class UsersService {
+  private readonly users = [
+    {
+      userId: 1,
+      username: 'john',
+      password: 'changeme',
+    },
+    {
+      userId: 2,
+      username: 'milner',
+      password: 'guess',
+    },
+    {
+        userId: 3,
+        username: 'james',
+        password: 'overthrow',
+    },
+    {
+        userId: 4,
+        username: 'ken',
+        password: 'overthrow',
+    },
+    {
+        userId: 5,
+        username: 'jason',
+        password: 'overthrow',
+        },
+  ];
 
-    getAllUsers(){   
-        console.log('UsersService - getAllusers()')     
-        return people.map( (person, index) => ({
-            name: person.name,
-            position: person.position,
-        }));
-    }
-
-
-    postLocation(user) {
-        console.log('running postLocation on server user=' + JSON.stringify(user, null,3));
-        const Pusher = require('pusher');
-        const {lat, lng} = user.position
-
-        people.forEach( (person, index) => {
-            if (person.position.lat === user.position.lat) {
-                people[index] = { ...person, position: { lat, lng } };
-                console.log('foreach person people =' + people[index]);
-                return  {person: people[index], people}
-            }
-        })
-    }
+  async findOne(username: string): Promise<User | undefined> {
+      console.log('async findOne(username: string): Promise<User | undefined> {' + username);
+    return this.users.find(user => user.username === username);
+  }
 }
