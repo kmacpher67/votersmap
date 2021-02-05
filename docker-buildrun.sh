@@ -40,6 +40,7 @@ cd usermap
 npm run build
 cd ..
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/js/*
+sleep 1
 
 echo "starting docker container restart"
 export b=$(basename "$PWD")"_smstest_1"

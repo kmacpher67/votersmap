@@ -55,21 +55,23 @@
     </gmap-map>
       <br> <label>Voter Mapper Search and find.</label>
       <button color="green darken-1" flat @click.native="print">Print</button>
-      <button color="green darken-1" flat @click.native="print">Print</button>
-    <div id="print"> 
+      <button color="red" flat @click.native="print">Print</button>
+    <div id="print" class='voterlist'> 
       <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
                     <th>Address</th>
                     <th>Birth Date </th>
-                    <th>MuniVotes</th>
+                    <th>muni vote</th>
                     <th>Details (Precinct,Party, totalVotes, Dem, Rep)</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="voter in voters" :key="voter.RESIDENTIAL_ADDRESS1" style="text-align:left">
-                    <td>{{voter.LAST_NAME}}, {{voter.FIRST_NAME}} </td>
+                    <td>{{voter.LAST_NAME}} </td>
+                    <td>{{voter.FIRST_NAME}} </td>
                     <td>{{voter.RESIDENTIAL_ADDRESS1}} {{voter.RESIDENTIAL_ADDRESS2}}</td>
                     <td>{{voter.DATE_OF_BIRTH}}</td>
                     <td style="text-align:center">{{voter.muniVotes}}</td>
@@ -131,15 +133,22 @@ export default {
   },
   computed: {
     filterVoters: function () {
-        console.log('computed: {filterVoters: function () {');
+        console.log('computed: {filterVoters: function () { voters=' + this.voters.length);
+
+        // sorting
+        //this.voters.sort((a, b) => a.name - b.name );
 
       return this.voters.filter(function (voter) {
-        return voter.name.indexOf(self.searchQuery) !== -1
-      })
+        console.log('return this.voters.filter(function (voter) { self.searchQuery=' + self.searchQuery);
+        // what do we want to filter on
+        //if (voter.muniVotes >= this.scoreLimit ) {this.setVoterMarker(voter, index);}
+        //return voter.RESIDENTIAL_ADDRESS1.indexOf(self.searchQuery) !== -1
+        return voter.muniVotes >= this.scoreLimit 
+      });
     },
     orderedVoters: function () {
-      return this.voters.orderBy(this.voters, 'muniVotes')
-    }
+      return this.voters.sort((a, b) => b.muniVotes - a.muniVotes );
+    },
   },
   methods: {
     // receives a place object via the autocomplete component
@@ -158,6 +167,15 @@ export default {
       if (this.scoreLimit>39) {
         this.scoreLimit=0;
       }
+    },
+    compare( a, b ) {
+      if ( a.RESIDENTIAL_ADDRESS1 < b.RESIDENTIAL_ADDRESS1 ){
+        return -1;
+      }
+      if ( a.RESIDENTIAL_ADDRESS1 > b.RESIDENTIAL_ADDRESS1 ){
+        return 1;
+      }
+      return 0;
     },
     print() {
       var prtContent = document.getElementById("print");
@@ -243,6 +261,10 @@ export default {
           console.log('fitBounds' );
           // var b = new google.maps.LatLngBounds();
     },
+    sortVotersList: function() {
+      console.log(' sortVotersList: function() {');
+      this.voters.sort((a, b) => b.muniVotes - a.muniVotes )
+    },
     geolocate: function() {
       navigator.geolocation.getCurrentPosition(position => {
         console.log('geolocate' + JSON.stringify(position, null, 3));
@@ -291,6 +313,7 @@ export default {
               console.log(response.data);
               this.voters = response.data;
               console.log('votersize...' + this.voters.length);
+              this.sortVotersList();
               if (this.voters.length >0) {
                  this.center = {
                   lat: this.voters[0].geometry.location.lat,
@@ -479,5 +502,7 @@ export default {
   .infopage {
     font-size:larger;
   }
-    
+  .voterlist {
+  font-size: smaller;
+  }
 </style>
