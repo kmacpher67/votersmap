@@ -248,6 +248,9 @@ export default {
     },
     compare( a, b, keyValue='RESIDENTIAL_ADDRESS1' ) {
       console.log('compare( a, b, keyValue=RESIDENTIAL_ADDRESS1 ) {');
+      if (keyValue.toLowerCase().indexOf('votes')>0) {
+        return b[keyValue] - a[keyValue];
+      }
       if ( a[keyValue] < b[keyValue] ){
         return -1;
       }
