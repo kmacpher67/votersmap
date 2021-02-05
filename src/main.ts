@@ -17,7 +17,7 @@ async function bootstrap() {
   // app.setBaseViewsDir('views');
   // app.set(join(__dirname, '..', 'usermap/dist'));
 
-  // app.setViewEngine('ejs');  // ejs or jade or hbs 
+  app.setViewEngine('ejs');  // ejs or jade or hbs 
   app.enableCors();
 
   await app.listen(3000);

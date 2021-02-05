@@ -53,29 +53,37 @@
             </div>
         </gmap-info-window>        
     </gmap-map>
-      <br> <label>Voter Mapper Search and find.</label>
-      <button color="green darken-1" flat @click.native="print">Print</button>
-      <button color="red" flat @click.native="print">Print</button>
+      <label>Voter Mapper Search and find.</label>
+      <button class="vs-component vs-button vs-button-primary vs-button-filled" color="red" @click="print">Print</button><br> 
     <div id="print" class='voterlist'> 
+      {{precinctSelected}}
       <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Last Name</th>
+                    <th style="font-size: smaller;"><a v-on:click="sortVotersList('LAST_NAME')">Last Name</a></th>
                     <th>First Name</th>
-                    <th>Address</th>
-                    <th>Birth Date </th>
-                    <th>muni vote</th>
-                    <th>Details (Precinct,Party, totalVotes, Dem, Rep)</th>
+                    <th><a v-on:click="sortVotersList('streetNum')">Str No</a></th>
+                    <th><a v-on:click="sortVotersList('street')">Street</a></th>
+                    <th style="font-size: smaller;"><a v-on:click="sortVotersList('DATE_OF_BIRTH')">birf</a></th>
+                    <th style="font-size: smaller;"><a v-on:click="sortVotersList('muniVotes')">city vot</a></th>
+                    <th><a v-on:click="sortVotersList('totalVotes')">tot</a></th>
+                    <th><a v-on:click="sortVotersList('demVotes')">Ds</a></th>
+                    <th><a v-on:click="sortVotersList('repVotes')">Rs</a></th>
+                    <th style="font-size: smaller;">party</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="voter in voters" :key="voter.RESIDENTIAL_ADDRESS1" style="text-align:left">
-                    <td>{{voter.LAST_NAME}} </td>
-                    <td>{{voter.FIRST_NAME}} </td>
-                    <td>{{voter.RESIDENTIAL_ADDRESS1}} {{voter.RESIDENTIAL_ADDRESS2}}</td>
-                    <td>{{voter.DATE_OF_BIRTH}}</td>
+                <tr v-for="voter in voters" :key="voter._id" style="text-align:left">
+                    <td style="font-size: smaller;">{{voter.LAST_NAME.toLowerCase().trim()}} </td>
+                    <td style="font-size: smaller;">{{voter.FIRST_NAME.toLowerCase().trim()}} </td>
+                    <td style="font-size: smaller;">{{voter.streetNum}}</td>
+                    <td style="font-size: smaller;">{{voter.street}} {{voter.RESIDENTIAL_ADDRESS2}}</td>
+                    <td style="font-size: smaller;">{{voter.DATE_OF_BIRTH.substr(0, 4)}}</td>
                     <td style="text-align:center">{{voter.muniVotes}}</td>
-                    <td>{{voter.PRECINCT_NAME}} {{voter.PARTY_AFFILIATION}} {{voter.totalVotes}} {{voter.demVotes}} {{voter.repVotes}}</td>
+                    <td style="text-align:center">{{voter.totalVotes}}</td>
+                    <td style="text-align:center">{{voter.demVotes}}</td>
+                    <td style="text-align:center">{{voter.repVotes}}</td>
+                    <td style="text-align:center"> {{voter.PARTY_AFFILIATION}}</td>
                 </tr>
             </tbody>
         </table>
@@ -131,25 +139,6 @@ export default {
     this.fitBounds();
     this.getPrecincts();
   },
-  computed: {
-    filterVoters: function () {
-        console.log('computed: {filterVoters: function () { voters=' + this.voters.length);
-
-        // sorting
-        //this.voters.sort((a, b) => a.name - b.name );
-
-      return this.voters.filter(function (voter) {
-        console.log('return this.voters.filter(function (voter) { self.searchQuery=' + self.searchQuery);
-        // what do we want to filter on
-        //if (voter.muniVotes >= this.scoreLimit ) {this.setVoterMarker(voter, index);}
-        //return voter.RESIDENTIAL_ADDRESS1.indexOf(self.searchQuery) !== -1
-        return voter.muniVotes >= this.scoreLimit 
-      });
-    },
-    orderedVoters: function () {
-      return this.voters.sort((a, b) => b.muniVotes - a.muniVotes );
-    },
-  },
   methods: {
     // receives a place object via the autocomplete component
     setPlace(place) {
@@ -167,15 +156,6 @@ export default {
       if (this.scoreLimit>39) {
         this.scoreLimit=0;
       }
-    },
-    compare( a, b ) {
-      if ( a.RESIDENTIAL_ADDRESS1 < b.RESIDENTIAL_ADDRESS1 ){
-        return -1;
-      }
-      if ( a.RESIDENTIAL_ADDRESS1 > b.RESIDENTIAL_ADDRESS1 ){
-        return 1;
-      }
-      return 0;
     },
     print() {
       var prtContent = document.getElementById("print");
@@ -261,9 +241,19 @@ export default {
           console.log('fitBounds' );
           // var b = new google.maps.LatLngBounds();
     },
-    sortVotersList: function() {
-      console.log(' sortVotersList: function() {');
-      this.voters.sort((a, b) => b.muniVotes - a.muniVotes )
+    sortVotersList: function(sortKey='muniVotes') {
+      console.log(' sortVotersList: function(sortKey=) {' + sortKey);
+      this.voters.sort((a, b) => this.compare(a, b, sortKey) );
+      console.log('    AFTER sortVotersList: function(sortKey=) {' + sortKey);
+    },
+    compare( a, b, keyValue='RESIDENTIAL_ADDRESS1' ) {
+      if ( a[keyValue] < b[keyValue] ){
+        return -1;
+      }
+      if ( a[keyValue] > b[keyValue] ){
+        return 1;
+      }
+      return 0;
     },
     geolocate: function() {
       navigator.geolocation.getCurrentPosition(position => {
@@ -306,6 +296,24 @@ export default {
       }
       this.placeMarkers();
     },
+    votersListStreet() {
+      console.log('votersListStreet() { adding values like street Name & streetnum');
+      this.voters.forEach( (voter ) => {
+        var a = voter.RESIDENTIAL_ADDRESS1.trim().split(' '), number, street;
+        if (a.length <= 1) {
+          console.log('votersListStreet() { =');
+          return;
+        }
+        number = a.shift();
+        voter.streetNum=number;
+        street = a.shift().toLowerCase() || '';
+        if (a.length >1 || street.length == 1) {
+          street = street + ' ' + a.shift().toLowerCase();
+        }
+        voter.street=street;
+        // console.log('voter street stuff: =' + number + ' ' + street+ ' streetNum=' +  voter.streetnum + ' street=' + voter.street );
+      });
+    },
     getVoters() {
       var targetUrl='/getprecinctByScore/'+this.precinctSelected+'/'+this.scoreLimit;
       console.log('getVoters() -- targetUrl=' + targetUrl);
@@ -313,7 +321,8 @@ export default {
               console.log(response.data);
               this.voters = response.data;
               console.log('votersize...' + this.voters.length);
-              this.sortVotersList();
+              // this.sortVotersList();
+              this.votersListStreet();
               if (this.voters.length >0) {
                  this.center = {
                   lat: this.voters[0].geometry.location.lat,
@@ -503,6 +512,7 @@ export default {
     font-size:larger;
   }
   .voterlist {
-  font-size: smaller;
+    font-size: smaller;
+    border-spacing: 1px;
   }
 </style>
