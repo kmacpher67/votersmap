@@ -1,33 +1,17 @@
 <template>
   <div id="app">
-    <hello-world />
-    <h6>@KenMacPherson 2010-2021 Help for the voters.</h6>
+    <div id="nav">
+      <router-link to="/">Public</router-link> |
+      <router-link to="/home">Home</router-link> |
+      <router-link to="/about">About</router-link>  | 
+      <router-link to="/profile">Profile</router-link>  | 
+      <router-link to="/login">Login</router-link> |  
+      <!-- <a href="#" v-on:click="logout">Logout</a>   -->
+    </div>
+    <router-view/>
   </div>
 </template>
 
-<script>
-// import HelloWorld from "@/components/HelloWorld"
-import HelloWorld from '@/components/HelloWorld.vue';
-// import {Client} from "@googlemaps/google-maps-services-js";
-// import {gmapApi} from '@/vue2-google-maps'
-// import gmapsInit from '@/gmaps';
-
-console.log('vue-App.vue - script HelloWorld default components before export default {' );
-
-// sed script to replace the following line GOOGLE_MAPS_API_KEY_ REPLACE
-// RUN sed -i "s/GOOGLE_MAPS_API_KEY_ REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/src/App.vue
-const GOOGLE_MAP_KEY = process.env.GOOGLE_MAP_KEY || "AIzaSyAfVlHH4ZLf4oy7dilAaBQACNGzLPZw9IM";
-console.log('vue-App.vue - script - GOOGLE_MAP_KEY= ' + GOOGLE_MAP_KEY);
-
-export default {
-  components: { HelloWorld },
-  name: 'App',
-  Components: {
-    HelloWorld    
-  },
-};
-
-</script>
 
 <style>
 #app {
@@ -36,9 +20,18 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 1px;
-  margin: 1px;
-  
 }
 
+#nav {
+  padding: 30px;
+}
+
+#nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+#nav a.router-link-exact-active {
+  color: #42b983;
+}
 </style>

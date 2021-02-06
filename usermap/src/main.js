@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import App from './App.vue'
-import VueRouter from 'vue-router'
 import * as VueGoogleMaps from "vue2-google-maps";
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import router from './router'
+import VueCookies from "vue-cookies"
 
 Vue.config.productionTip = false
 
@@ -14,17 +15,20 @@ console.log('vue-main.js - GOOGLE_MAP_KEY= ' + GOOGLE_MAP_KEY);
 
 // const DEFAULT_PRECINCTS = ["WARREN CITY 5K"]
 
-// Define a new component called button-counter
-Vue.component('button-counter', {
-  data: function () {
-    return {
-      count: 0
-    }
-  },
-  template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>'
-});
 
-new Vue({ el: '#components-demo' });
+// export default {
+//   name: "App",
+//   methods: {
+//     logout: function (e) {
+//       console.log('logout: function (e) { e = ' + e);
+//       axios.get("/api/logout")
+//         .then(() => {
+//           router.push("/")
+//         })
+//     }
+//   }
+// }
+
 
 Vue.use(VueGoogleMaps, {
   load: {
@@ -35,10 +39,15 @@ Vue.use(VueGoogleMaps, {
 
 Vue.use(VueAxios, axios);
 
+Vue.use(VueCookies)
+
+Vue.config.kenwashere = false
+
 new Vue({
   el: "#app",
-  render: h => h(App)
-});
+  router,
+  render: h => h(App),
+}).$mount('#app')
 
 
 // new Vue({ el: '#app', router, render: h => h(App) })

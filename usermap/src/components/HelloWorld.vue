@@ -192,7 +192,7 @@ export default {
               this.infoOptions.content = this.infoOptions.content + this.parseVoterInfoText(element);
             });
 
-            this.infoOptions.content='<div id="components-demo"><button-counter></button-counter></div><div id="voterInfoDetails" class="infopage">'+this.infoOptions.content;
+            this.infoOptions.content='<div id="voterInfoDetails" class="infopage">'+this.infoOptions.content;
             this.infoOptions.content= this.infoOptions.content+'</div><button onclick="console.log(this);window.getSelection().removeAllRanges(); var range = document.createRange(); range.selectNode(document.getElementById(\'voterInfoDetails\'));window.getSelection().addRange(range);document.execCommand(\'copy\');">Copy to Clipboard</button> ';
 
             //this.infoOptions.content = marker.infoText;

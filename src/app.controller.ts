@@ -16,6 +16,12 @@ export class AppController {
     return req.user;
   }
 
+  @UseGuards(AuthGuard('local'))
+  @Post('auth/logout')
+  async logout(@Req() req) {
+    return req.user;
+  }
+
   @Get()
       root(@Res() res) {
         console.log('rendering AppController res=' + res);
