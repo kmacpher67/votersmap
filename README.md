@@ -57,6 +57,10 @@ curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password
 # result -> {"userId":1,"username":"john"}
 ```
 
+cd usermap
+https://blog.jscrambler.com/vue-js-authentication-system-with-node-js-backend/
+
+
 ## Docker hell issues for containerization
 
 WARNING: Image for service smstest was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `ls `.

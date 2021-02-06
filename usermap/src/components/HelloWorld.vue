@@ -64,7 +64,7 @@
                     <th>First Name</th>
                     <th class="initial "><a v-on:click="sortVotersList('streetNum')" v-class="{active: isActive}">Str No</a></th>
                     <th class="initial active"><a v-on:click="sortVotersList('street')" v-class="{active: isActive}">Street</a></th>
-                    <th class="initial " style="font-size: smaller;"><a v-on:click="sortVotersList('DATE_OF_BIRTH')">birf</a></th>
+                    <th class="initial " style="font-size: smaller;"><a v-on:click="sortVotersList('DATE_OF_BIRTH')" v->birf</a></th>
                     <th style="font-size: smaller;"><a v-on:click="sortVotersList('muniVotes')">city vot</a></th>
                     <th class="initial "><a v-on:click="sortVotersList('totalVotes')" v-class="{active: isActive}">tot</a></th>
                     <th><a v-on:click="sortVotersList('demVotes')">Ds</a></th>
