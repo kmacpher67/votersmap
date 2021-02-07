@@ -32,7 +32,7 @@
       :fullscreenControl=true
       :zoomControl=true
       :streetViewControl=true
-      style="width:100%; height:700px;"
+      style="width:100%; height:682px;"
     >
         <gmap-marker
           :key="index"
