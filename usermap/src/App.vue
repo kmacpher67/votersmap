@@ -5,7 +5,7 @@
       <router-link to="/home">Home</router-link> |
       <router-link to="/about">About</router-link>  | 
       <router-link to="/profile">Profile</router-link>  | 
-      <router-link to="/login">Login</router-link> 
+      <router-link to="/login" active-class="user">Login</router-link> 
       <!-- <a href="#" v-on:click="logout">Logout</a>   -->
     </div>
     <router-view/>

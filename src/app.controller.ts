@@ -22,6 +22,12 @@ export class AppController {
     return req.user;
   }
 
+  @UseGuards(AuthGuard('local'))
+  @Get('users/profile')
+  async profile(@Req() req) {
+    return req.user;
+  }
+
   @Get()
       root(@Res() res) {
         console.log('rendering AppController res=' + res);

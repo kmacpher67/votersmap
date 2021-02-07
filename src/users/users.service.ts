@@ -37,4 +37,14 @@ export class UsersService {
       console.log('async findOne(username: string): Promise<User | undefined> {' + username);
     return this.users.find(user => user.username === username);
   }
+
+  async profile(username: string): Promise<User | undefined> {
+    console.log('async profile(username: string): Promise<User | undefined> {' + username);
+  return this.users.find(user => user.username === username);
+  }
+
+  async save(user: User): Promise<User | undefined> {
+    console.log('save profile(username: string): Promise<User | undefined> {' + user);
+  return this.users.push(user);
+  }
 }
