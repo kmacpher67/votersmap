@@ -284,7 +284,7 @@ export default {
     precinctChange(events) {
       var targetUrl='/getprecinctByScore/' + this.precinctSelected + JSON.stringify(events,null,3);
       console.log('precinctChange(events) { -- targetUrl=' + targetUrl);
-
+      this.getVoters();
     },
     partyAffliationFilter() {
       console.log('partyAffliationFilter() { = ' + this.partyAffliation);
