@@ -170,7 +170,7 @@ export default {
         console.log(' enterPage(positionLatLng)=' + positionLatLng);
         this.center = positionLatLng;
     },
-    toggleInfoWindow: function(marker, idx) {
+    toggleInfoWindow(marker, idx) {
         console.log('toggleInfoWindow: function(marker, idx) {' + JSON.stringify(marker,null,3) + idx);
             this.infoWindowPos = marker.position;
             this.infoOptions.content='';
@@ -259,7 +259,7 @@ export default {
       }
       return 0;
     },
-    geolocate: function() {
+    geolocate() {
       navigator.geolocation.getCurrentPosition(position => {
         console.log('geolocate' + JSON.stringify(position, null, 3));
         this.center = {
