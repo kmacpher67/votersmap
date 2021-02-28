@@ -101,6 +101,7 @@ export default {
       voters: [],
       places: [],
       infoOptionText: '',
+      infoOptionAddressText: '',
       infoOptionVoter: null,
       wards: ["WARREN-WARD 1", "WARREN-WARD 2",  "WARREN-WARD 3",  "WARREN-WARD 4",  "WARREN-WARD 5",  "WARREN-WARD 6","WARREN-WARD 7"],
       precincts: ["WARREN CITY 1A","WARREN CITY 1B","WARREN CITY 1E","WARREN CITY 1G","WARREN CITY 2C","WARREN CITY 2F","WARREN CITY 2G","WARREN CITY 3D","WARREN CITY 3G","WARREN CITY 3J","WARREN CITY 3K","WARREN CITY 3L","WARREN CITY 4A","WARREN CITY 4D","WARREN CITY 4F","WARREN CITY 5D","WARREN CITY 5E","WARREN CITY 5F","WARREN CITY 5G","WARREN CITY 5K","WARREN CITY 6B","WARREN CITY 6D","WARREN CITY 6G","WARREN CITY 7A","WARREN CITY 7C","WARREN CITY 7D"],
@@ -138,8 +139,18 @@ export default {
     this.clickMe();
     this.fitBounds();
     this.getPrecincts();
+    this.setLastUsedPrecinct(null);
   },
   methods: {
+    setLastUsedPrecinct(precinctSelectedValue) {
+
+      if (null === precinctSelectedValue && localStorage.getItem('precinctSelected')) {
+          this.precinctSelected=localStorage.getItem('precinctSelected')
+      }
+      else {
+        localStorage.setItem('precinctSelected',precinctSelectedValue);
+      }
+    },
     // receives a place object via the autocomplete component
     setPlace(place) {
       console.log('setPlace(place)  = ' + place);
@@ -186,10 +197,14 @@ export default {
             locInfoAddresses.forEach( (element, index) => {
               console.log(element + index);
               if (index>0) { 
-                this.infoOptions.content = this.infoOptions.content + '<br>'
+                this.infoOptions.content = this.infoOptions.content + '<br>' + this.parseVoterInfoText(element);
               }
-              console.log('this.infoOptions=' + this.infoOptions);
-              this.infoOptions.content = this.infoOptions.content + this.parseVoterInfoText(element);
+              else {
+                // ADD address Ward details only to 1st record. 
+                console.log('this.infoOptions=' + this.infoOptions);
+                this.infoOptions.content = + this.parseVoterAddressInfoText(element) + this.infoOptions.content + this.parseVoterInfoText(element);
+              }
+
             });
 
             this.infoOptions.content='<div id="voterInfoDetails" class="infopage">'+this.infoOptions.content;
@@ -284,6 +299,7 @@ export default {
     precinctChange(events) {
       var targetUrl='/getprecinctByScore/' + this.precinctSelected + JSON.stringify(events,null,3);
       console.log('precinctChange(events) { -- targetUrl=' + targetUrl);
+      localStorage.setItem('precinctSelected', this.precinctSelected);
       this.getVoters();
     },
     partyAffliationFilter() {
@@ -438,6 +454,17 @@ export default {
       // voterInfoText = voterInfoText + '<br/>';
 
       this.infoOptionText = voterInfoText;
+      return voterInfoText;
+    },
+    parseVoterAddressInfoText(voterinfo) {
+      console.log('parseVoterAddressInfoText() creating header {=' + voterinfo.RESIDENTIAL_ADDRESS1  + voterinfo.SOS_VOTERID + voterinfo.LAST_NAME);
+
+      var voterInfoText = '';
+      voterInfoText = voterInfoText + '<label>'+ voterinfo.RESIDENTIAL_ADDRESS1 + ' </label>';
+      voterInfoText = voterInfoText + '<label>  '+ (voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '</label><br/>';
+      voterInfoText = voterInfoText + '<label>  '+ (voterinfo.PRECINCT_NAME ||'') + '</label><br/>';
+
+      this.infoOptionAddressText = voterInfoText;
       return voterInfoText;
     },
     selectCopy(containerid) {
