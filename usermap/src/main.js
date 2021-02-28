@@ -5,6 +5,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import router from './router'
 import VueCookies from "vue-cookies"
+// import InfoWindowComponent from './components/InfoWindow.vue';
 
 Vue.config.productionTip = false
 
@@ -44,6 +45,22 @@ Vue.use(VueGoogleMaps, {
   }
 });
 
+// var InfoWindow = Vue.extend(InfoWindowComponent);
+// var instance = new InfoWindow({
+//     propsData: {
+//         content: "This displays as info-window content! Default dummy."
+//     }
+// });
+
+// instance.$mount();
+
+// var new_infowindow = new VueGoogleMaps.maps.InfoWindow({
+//     content: instance.$el,
+// });
+
+// // new_infowindow.open(<map object>, <marker>);
+// new_infowindow.open()
+
 
 
 // API_PORT=3000 
@@ -53,23 +70,26 @@ Vue.use(VueCookies)
 
 // axios.defaults.baseURL='http://localhost/3000';
 console.log(window.location)
-console.log(axios.defaults.baseURL)
-var apiHostURL= new URL(window.location.origin);
-console.log('apiHostURL=' + apiHostURL);
-apiHostURL.port="3000";
-apiHostURL.protocol=window.location.protocol;
-console.log('apiHostURL=' + apiHostURL);
-axios.defaults.baseURL=apiHostURL.host || "http://localhost:3000";
-// // axios.defaults.baseURL=apiHostURL.host || "http://l3000";
+console.log('axios.defaults.baseURL='+axios.defaults.baseURL)
+// var apiHostURL= new URL(window.location.origin);
+// console.log('apiHostURL=' + apiHostURL);
+// apiHostURL.port="3000";
+// apiHostURL.protocol=window.location.protocol;
+// console.log('apiHostURL=' + apiHostURL);
+// axios.defaults.baseURL=apiHostURL.origin || "http://localhost:3000";
+
 // // axios.defaults.apiHostPort='3000';
 // // axios.defaults.serverHostPort='3000';
 axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
+axios.defaults.headers.common['Access-Control-Allow-Access-Control-Allow-Methods'] = "GET, POST, PATCH, PUT, DELETE, OPTIONS";
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+axios.defaults.headers.common['Access-Control-Allow-Headers'] = "Origin, Content-Type, X-Auth-Token, Authorization, X-Requested-With";
 console.log(process.env.NODE_ENV)
 console.log(process.env.VUE_APP_API_PORT)
 console.log(process.env.VUE_APP_DOOSVARS)
 console.log(process.env.VUE_APP_TITLE)
 
+console.log('axios.defaults' + JSON.stringify(axios.defaults));
 Vue.config.kenwashere = false
 
 new Vue({

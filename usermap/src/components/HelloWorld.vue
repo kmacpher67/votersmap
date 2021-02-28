@@ -24,6 +24,9 @@
       <label>
         <button @click="getVoters" title="get new Voters query">voters</button>
       </label>
+      <label>
+        <button @click="getMine" title="get my reminderVoters">me</button>
+      </label>
       m={{markers.length}}, tv={{voters.length}}
     </div>
     <gmap-map
@@ -65,7 +68,7 @@
                     <th class="initial active"><a v-on:click="sortVotersList('streetNum')" >Str No</a></th>
                     <th class="initial active"><a v-on:click="sortVotersList('street')" >Street</a></th>
                     <th class="initial " style="font-size: smaller;"><a v-on:click="sortVotersList('DATE_OF_BIRTH')" v->birf</a></th>
-                    <th style="font-size: smaller;"><a v-on:click="sortVotersList('muniVotes')">city vot</a></th>
+                    <th class="initial active" style="font-size: smaller;"><a v-on:click="sortVotersList('muniVotes')">city vot</a></th>
                     <th class="initial active"><a v-on:click="sortVotersList('totalVotes')" >tot</a></th>
                     <th><a v-on:click="sortVotersList('demVotes')">Ds</a></th>
                     <th><a v-on:click="sortVotersList('repVotes')">Rs</a></th>
@@ -73,7 +76,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="voter in voters" :key="voter._id" style="text-align:left">
+                <tr v-for="voter in voters" :key="voter._id"  v-on:click="placeMarkerFor(voter)" style="text-align:left" class='clickable-row'>
                     <td style="font-size: smaller;">{{voter.LAST_NAME.toLowerCase().trim()}} </td>
                     <td style="font-size: smaller;">{{voter.FIRST_NAME.toLowerCase().trim()}} </td>
                     <td style="font-size: smaller;">{{voter.streetNum}}</td>
@@ -100,9 +103,11 @@ export default {
       markers: [],
       voters: [],
       places: [],
+      apiHostURL: 'http://localhost:3000',
       infoOptionText: '',
       infoOptionAddressText: '',
-      infoOptionVoter: null,
+      infoOptionVoters: [],
+      myVoters:[],
       wards: ["WARREN-WARD 1", "WARREN-WARD 2",  "WARREN-WARD 3",  "WARREN-WARD 4",  "WARREN-WARD 5",  "WARREN-WARD 6","WARREN-WARD 7"],
       precincts: ["WARREN CITY 1A","WARREN CITY 1B","WARREN CITY 1E","WARREN CITY 1G","WARREN CITY 2C","WARREN CITY 2F","WARREN CITY 2G","WARREN CITY 3D","WARREN CITY 3G","WARREN CITY 3J","WARREN CITY 3K","WARREN CITY 3L","WARREN CITY 4A","WARREN CITY 4D","WARREN CITY 4F","WARREN CITY 5D","WARREN CITY 5E","WARREN CITY 5F","WARREN CITY 5G","WARREN CITY 5K","WARREN CITY 6B","WARREN CITY 6D","WARREN CITY 6G","WARREN CITY 7A","WARREN CITY 7C","WARREN CITY 7D"],
       users: [{name: 'kenny', position:{lat:41.238553, lng:-80.8258473}}],
@@ -140,6 +145,7 @@ export default {
     this.fitBounds();
     this.getPrecincts();
     this.setLastUsedPrecinct(localStorage.getItem('precinctSelected'));
+    window.saveReminder = this.saveReminder
   },
   methods: {
     setHostApiConfig() {
@@ -152,7 +158,8 @@ export default {
         apiHostURL.port="3000";
         apiHostURL.protocol=window.location.protocol;
         console.log('apiHostURL=' + apiHostURL);
-        this.axios.defaults.baseURL=apiHostURL.origin || "http://localhost:3000";
+        this.apiHostURL=apiHostURL.origin.toString().trim();
+        // this.axios.defaults.baseURL=apiHostURL.origin || "http://localhost:3000";
         this.axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
         this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
     },
@@ -199,12 +206,28 @@ export default {
         console.log(' enterPage(positionLatLng)=' + positionLatLng);
         this.center = positionLatLng;
     },
+    placeMarkerFor(voter) {
+      console.log('placeMarkerFor(voter) {=' + JSON.stringify(voter));
+
+      var marker = this.markers.find(m => m.sosVoterID === voter.SOS_VOTERID);
+      if (undefined === marker || null === marker) {
+        this.setVoterMarker(voter, this.voters.findIndex(function(item){  return item.SOS_VOTERID === voter.SOS_VOTERID }));
+      }
+      console.log('marker = ' +JSON.stringify(marker));
+      // var idx = this.markers[marker];
+      this.infoOptions.content='';
+      var mindex = this.markers.indexOf(marker)
+      console.log('mindex=' + mindex)
+      // this.infoVoter(voter,mindex);
+      this.infoWindowPos = marker.position;
+      this.toggleInfoWindow(marker,mindex);
+    },
     toggleInfoWindow(marker, idx) {
         console.log('toggleInfoWindow: function(marker, idx) {' + JSON.stringify(marker) + idx);
             this.infoWindowPos = marker.position;
             this.infoOptions.content='';
 
-            // should we be checking voters and adding them as additional markers
+            //should we be checking voters and adding them as additional markers
             // var allAddresses = this.markers.filter(function(item) {
             //     return item.RESIDENTIAL_ADDRESS1 == marker.RESIDENTIAL_ADDRESS1;
             // });
@@ -212,8 +235,14 @@ export default {
             // console.log('markers filtered for allAddresses =' + allAddresses );
             var targetVoter = this.voters.find(v => v.SOS_VOTERID === marker.sosVoterID);
             console.log('toggleInfoWindow targetVoter=' + targetVoter);
+            this.infoVoter(targetVoter, idx)
+    },
+    infoVoter(targetVoter, idx) {
+        console.log("infoVoter(targetVoter) {" + idx);
             var locInfoAddresses = this.findOtherAddresses( targetVoter);
             // var locInfoAddresses = this.findOtherAddresses(this.voters[marker.voterIndex]);
+
+            this.infoOptionVoters = locInfoAddresses;
 
             locInfoAddresses.forEach( (element, index) => {
               console.log(element + index);
@@ -230,7 +259,9 @@ export default {
 
             this.infoOptions.content='<div id="voterInfoDetails" class="infopage">'+this.infoOptions.content;
             this.infoOptions.content= this.infoOptions.content+'</div><button onclick="console.log(this);window.getSelection().removeAllRanges(); var range = document.createRange(); range.selectNode(document.getElementById(\'voterInfoDetails\'));window.getSelection().addRange(range);document.execCommand(\'copy\');">Copy to Clipboard</button> ';
-            this.infoOptions.content= this.infoOptions.content+'</div><button onclick="console.log(document.getElementById(\'voterinfo.SOS_VOTERID\').innerHTML);;">Follow Up!</button> ';
+            // this.infoOptions.content= this.infoOptions.content+'</div><button onclick="console.log(document.getElementsByClassName(\'voterinfo.SOS_VOTERID\')); ;">Follow Up!</button> ';
+            this.infoOptions.content= this.infoOptions.content+'</div><button onclick="saveReminder();">Follow Up!</button> ';
+            this.infoOptions.content= this.infoOptions.content+'</div><button onclick="removeReminder();">Forget</button> ';
 
             //this.infoOptions.content = marker.infoText;
             //check if its the same marker that was selected if yes toggle
@@ -243,6 +274,65 @@ export default {
               this.currentMidx = idx;
 
             }
+    },
+    removeReminder(voters) {
+      console.log("removeReminder - "+ JSON.stringify(voters, null, 3));
+      console.log("removeReminder - infoOptionVoters="+ JSON.stringify(this.infoOptionVoters));
+            if (null === this.myVoters || this.myVoters.length >0) {
+        this.infoOptionVoters.forEach( (voter ) => {
+          var removeIndex =  this.voters.findIndex(function(item){  return item.SOS_VOTERID === voter.SOS_VOTERID });
+          console.log('removing index:' + removeIndex + voter.LAST_NAME);
+          this.myVoters.splice( removeIndex,1)
+        });
+        localStorage.rememberVoters=JSON.stringify(this.myVoters);
+      }
+    },
+    saveReminder(voters) {
+      console.log("save reminder() - "+ JSON.stringify(voters, null, 3));
+      // var mine = document.getElementsByClassName("voterinfo.SOS_VOTERID");
+      console.log("save reminder() - "+ JSON.stringify(this.infoOptionVoters));
+      if (null === this.myVoters || this.myVoters.length >0) {
+        this.infoOptionVoters.forEach( (voter ) => {
+          var removeIndex =  this.voters.findIndex(function(item){  return item.SOS_VOTERID === voter.SOS_VOTERID });
+          console.log('saveReminder(voters) save index:' + removeIndex + voter.LAST_NAME);
+          this.myVoters.push( voter)
+        });
+        localStorage.rememberVoters=JSON.stringify(this.myVoters);
+      }
+    },
+    getMine() {
+      console.log("getMine rememberVoters=" + localStorage.rememberVoters);
+
+       if (null === this.myVoters || this.myVoters.length === 0 || null === this.voters[0].geometry) {
+        var jobjects=JSON.parse(localStorage.rememberVoters);
+        console.log('jobjects. = ('+jobjects);
+        jobjects.forEach( (j ) => {
+          if (null !== j) {
+            console.log('jobjects.forEach( JSON.stringify(j)='+ JSON.stringify(j));
+            this.myVoters.push(j);
+          } else {
+            console.log('jobjects.forEach( j is null??='+j);
+          }
+
+        });
+       }
+
+
+      
+
+              this.voters = this.myVoters;
+
+              console.log('votersize...' + this.voters.length);
+              this.sortVotersList();
+            
+              if (this.voters.length >0) {
+                 console.log('this this.voters[0]=' + this.voters[0].geometry);
+                 this.center = {
+                  lat: this.voters[0].geometry.location.lat,
+                  lng: this.voters[0].geometry.location.lng
+                };
+              }
+             this.placeMarkers();
     },
     addMarker() {
       if (this.currentPlace) {
@@ -285,7 +375,7 @@ export default {
     },
     compare( a, b, keyValue='RESIDENTIAL_ADDRESS1' ) {
       // console.log('compare( a, b, keyValue = ' + keyValue);
-      if (keyValue.toLowerCase().indexOf('Vote')>0) {
+      if (keyValue.toLowerCase().indexOf('vote')>0) {
         return b[keyValue] - a[keyValue];
       }
       if ( a[keyValue] < b[keyValue] ){
@@ -306,7 +396,7 @@ export default {
       });
     },
     getPrecincts() {
-      var targetUrl='/precincts';
+      var targetUrl=this.apiHostURL+'/precincts';
       console.log('getPrecincts-- targetUrl=' + targetUrl);
       console.log('getPrecincts-- this.axios=' + JSON.stringify(this.axios.defaults) );
        this.axios.get(targetUrl).then(response => {
@@ -358,8 +448,9 @@ export default {
       });
     },
     getVoters() {
-      var targetUrl='/getprecinctByScore/'+this.precinctSelected+'/'+this.scoreLimit;
+      var targetUrl=this.apiHostURL+'/getprecinctByScore/'+encodeURIComponent(this.precinctSelected)+'/'+this.scoreLimit;
       console.log('getVoters() -- targetUrl=' + targetUrl);
+      console.log('axios.default'+JSON.stringify(this.axios.default))
       this.axios.get(targetUrl).then(response => {
               console.log(response.data);
               this.voters = response.data;
@@ -463,7 +554,7 @@ export default {
     parseVoterInfoText(voterinfo) {
       console.log('parseVoterInfoText() {=' + voterinfo.SOS_VOTERID + voterinfo.LAST_NAME);
 
-      var voterInfoText = '<label id="voterinfo.SOS_VOTERID" value="'+ voterinfo.SOS_VOTERID + '">'+ voterinfo.SOS_VOTERID + ' </label><br/>';
+      var voterInfoText = '<label class="voterinfo.SOS_VOTERID" value="'+ voterinfo.SOS_VOTERID + '">'+ voterinfo.SOS_VOTERID + ' </label><br/>';
       // voterInfoText = voterInfoText + '<label> CountyID:'+ voterinfo.COUNTY_ID + '</label><br/>';
       voterInfoText = voterInfoText + '<label>'+ voterinfo.FIRST_NAME + ' </label> ';
       voterInfoText = voterInfoText + '<label> '+ voterinfo.LAST_NAME + ' </label><br/>';
@@ -499,7 +590,7 @@ export default {
     },
     getVoter(voterRec) {
       console.log('getVoter(voterRec) ='+ JSON.stringify(voterRec))
-      this.axios.get('/users/'+JSON.stringify(voterRec)).then(response => {
+      this.axios.get(this.apiHostURL+'/users/'+JSON.stringify(voterRec)).then(response => {
               console.log(response.data.json);
               this.currentVoterDetails=response.data.json;
               return response.data.json;
@@ -517,7 +608,9 @@ export default {
     getUser() {
       console.log('getUser() ')
       this.users = this.setDefaultUsers();
-      this.axios.get('/users').then(response => {
+      var userURL = this.apiHostURL+'/users'
+      console.log('url='+userURL)
+      this.axios.get(userURL).then(response => {
               console.log(response.data);
               this.users = this.getRandomUsers(response.data, 6)
           }).catch(function (error) {

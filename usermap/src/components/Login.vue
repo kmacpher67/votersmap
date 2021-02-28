@@ -37,11 +37,14 @@
                     password: this.password      
                 } 
                 console.log('data=' + data)
+                console.log('axios defaults=' + JSON.stringify(axios.defaults));
+            var apiHostURL= new URL(window.location.origin);
+            console.log('apiHostURL=' + apiHostURL);
+            apiHostURL.port="3000";
+            apiHostURL.protocol=window.location.protocol;
+            console.log('apiHostURL=' + apiHostURL);
 
-
-
-                axios.defaults.serverHostPort=3000;
-                axios.post("/auth/login", data)  
+                axios.post(apiHostURL+"auth/login", data)  
                     .then((response) => {    
                         console.log("Logged in response=" + JSON.stringify(response, null,3))
                         // //  result -> {"userId":1,"username":"john"}

@@ -17,8 +17,23 @@ async function bootstrap() {
   // app.setBaseViewsDir('views');
   // app.set(join(__dirname, '..', 'usermap/dist'));
 
+  const options = {
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: true,
+    optionsSuccessStatus: 204,
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept',
+  };
+
   app.setViewEngine('ejs');  // ejs or jade or hbs 
   app.enableCors();
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With');
+    next();
+  });
 
   await app.listen(3000);
   console.log(`smstext voters is running on: ${await app.getUrl()}`);

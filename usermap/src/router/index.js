@@ -21,7 +21,7 @@ router.beforeEach((to, from, next) => {
     //   name: 'Home'
       // })
       // object
-      router.push({ path: 'home' });
+      router.push({ path: '/home',name: 'Home' });
   }
 
   if (to.path === "/logout") {
@@ -29,7 +29,7 @@ router.beforeEach((to, from, next) => {
 
     localStorage.clear('jwt');
     localStorage.clear('user');
-    router.push({ path: 'login' });
+    router.push({ path: '/home',name: 'Home' });
   }
 
   // console.log(' axios =defaults ' + JSON.stringify(axios.defaults, null, 3) );
