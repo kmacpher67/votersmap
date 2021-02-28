@@ -32,7 +32,7 @@ COPY ./usermap/ ./usermap/
 
 RUN echo "build vuesj dist production of voter UI app: cd usermap; npm install; npm run build"
 RUN rm -f usermap/package-lock.json
-RUN cd usermap; npm install; npm run build
+RUN cd usermap; npm install; npm run build:dev
 RUN cd -
 
 RUN echo "the var GOOGLE_MAPS_API_KEY should be set "; [ -z "$var" ] && echo "Empty"

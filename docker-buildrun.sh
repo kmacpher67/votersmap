@@ -38,7 +38,7 @@ echo "starting sed commands ... "
 sleep 1
 echo "cd usermap npm run build vuejs app"
 cd usermap
-npm run build
+npm run build:dev
 cd ..
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/js/*
 sed -i "s/GOOGLE_MAPS_API_KEY_REPLACE/$GOOGLE_MAPS_API_KEY/g" usermap/dist/*

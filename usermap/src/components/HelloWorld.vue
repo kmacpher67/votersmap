@@ -16,13 +16,13 @@
           <option v-for="precint in precincts" :value="precint" :key="precint">{{ precint }}</option>
         </select>
       <label>
-        <button @click="partyAffliationFilter" v-b-tooltip.hover title="Filter vote totals by party voter count T,D,M,R">{{partyAffliation}}</button>
+        <button @click="partyAffliationFilter"  title="Filter vote totals by party voter count T,D,M,R">{{partyAffliation}}</button>
       </label>
       <label>
-        <button @click="incrementScore" v-b-tooltip.hover title="totalScore Limit">{{scoreLimit}}</button>
+        <button @click="incrementScore" title="totalScore Limit">{{scoreLimit}}</button>
       </label>
       <label>
-        <button @click="getVoters" v-b-tooltip.hover title="get new Voters query">voters</button>
+        <button @click="getVoters" title="get new Voters query">voters</button>
       </label>
       m={{markers.length}}, tv={{voters.length}}
     </div>
@@ -62,11 +62,11 @@
                 <tr>
                     <th style="font-size: smaller;"><a v-on:click="sortVotersList('LAST_NAME')">Last Name</a></th>
                     <th>First Name</th>
-                    <th class="initial "><a v-on:click="sortVotersList('streetNum')" v-class="{active: isActive}">Str No</a></th>
-                    <th class="initial active"><a v-on:click="sortVotersList('street')" v-class="{active: isActive}">Street</a></th>
+                    <th class="initial active"><a v-on:click="sortVotersList('streetNum')" >Str No</a></th>
+                    <th class="initial active"><a v-on:click="sortVotersList('street')" >Street</a></th>
                     <th class="initial " style="font-size: smaller;"><a v-on:click="sortVotersList('DATE_OF_BIRTH')" v->birf</a></th>
                     <th style="font-size: smaller;"><a v-on:click="sortVotersList('muniVotes')">city vot</a></th>
-                    <th class="initial "><a v-on:click="sortVotersList('totalVotes')" v-class="{active: isActive}">tot</a></th>
+                    <th class="initial active"><a v-on:click="sortVotersList('totalVotes')" >tot</a></th>
                     <th><a v-on:click="sortVotersList('demVotes')">Ds</a></th>
                     <th><a v-on:click="sortVotersList('repVotes')">Rs</a></th>
                     <th style="font-size: smaller;">party</th>
@@ -120,7 +120,6 @@ export default {
       infoOptions: {
         content: '',
         maxWidth: 390,
-        background: 'blue',
             // optional: offset infowindow so it visually sits nicely on top of our marker
             pixelOffset: {
               width: 15,
@@ -133,18 +132,37 @@ export default {
 
   mounted() {
     console.log('mounted method... in vue.use');
+    this.setHostApiConfig();
     this.geolocate();
     this.getUser();
     this.changeZoom();
     this.clickMe();
     this.fitBounds();
     this.getPrecincts();
-    this.setLastUsedPrecinct(null);
+    this.setLastUsedPrecinct(localStorage.getItem('precinctSelected'));
   },
   methods: {
+    setHostApiConfig() {
+        console.log(window.location)
+        console.log(' axios =defaults ' + JSON.stringify(this.axios.defaults) );
+
+        console.log(this.axios.defaults.baseURL)
+        var apiHostURL= new URL(window.location.origin);
+        console.log('apiHostURL=' + apiHostURL);
+        apiHostURL.port="3000";
+        apiHostURL.protocol=window.location.protocol;
+        console.log('apiHostURL=' + apiHostURL);
+        this.axios.defaults.baseURL=apiHostURL.origin || "http://localhost:3000";
+        this.axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded'
+        this.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+    },
     setLastUsedPrecinct(precinctSelectedValue) {
 
-      if (null === precinctSelectedValue && localStorage.getItem('precinctSelected')) {
+      if(null === precinctSelectedValue) {
+        precinctSelectedValue="WARREN CITY 5K";
+      }
+
+      if ( localStorage.getItem('precinctSelected')) {
           this.precinctSelected=localStorage.getItem('precinctSelected')
       }
       else {
@@ -182,17 +200,20 @@ export default {
         this.center = positionLatLng;
     },
     toggleInfoWindow(marker, idx) {
-        console.log('toggleInfoWindow: function(marker, idx) {' + JSON.stringify(marker,null,3) + idx);
+        console.log('toggleInfoWindow: function(marker, idx) {' + JSON.stringify(marker) + idx);
             this.infoWindowPos = marker.position;
             this.infoOptions.content='';
 
             // should we be checking voters and adding them as additional markers
-            var allAddresses = this.markers.filter(function(item) {
-                return item.RESIDENTIAL_ADDRESS1 == marker.RESIDENTIAL_ADDRESS1;
-            });
-            console.log('markers filtered for allAddresses =' + allAddresses );
+            // var allAddresses = this.markers.filter(function(item) {
+            //     return item.RESIDENTIAL_ADDRESS1 == marker.RESIDENTIAL_ADDRESS1;
+            // });
 
-            var locInfoAddresses = this.findOtherAddresses(this.voters[marker.voterIndex]);
+            // console.log('markers filtered for allAddresses =' + allAddresses );
+            var targetVoter = this.voters.find(v => v.SOS_VOTERID === marker.sosVoterID);
+            console.log('toggleInfoWindow targetVoter=' + targetVoter);
+            var locInfoAddresses = this.findOtherAddresses( targetVoter);
+            // var locInfoAddresses = this.findOtherAddresses(this.voters[marker.voterIndex]);
 
             locInfoAddresses.forEach( (element, index) => {
               console.log(element + index);
@@ -202,13 +223,14 @@ export default {
               else {
                 // ADD address Ward details only to 1st record. 
                 console.log('this.infoOptions=' + this.infoOptions);
-                this.infoOptions.content = + this.parseVoterAddressInfoText(element) + this.infoOptions.content + this.parseVoterInfoText(element);
+                this.infoOptions.content =  this.parseVoterAddressInfoText(element) + '<br>' + this.infoOptions.content + this.parseVoterInfoText(element);
               }
 
             });
 
             this.infoOptions.content='<div id="voterInfoDetails" class="infopage">'+this.infoOptions.content;
             this.infoOptions.content= this.infoOptions.content+'</div><button onclick="console.log(this);window.getSelection().removeAllRanges(); var range = document.createRange(); range.selectNode(document.getElementById(\'voterInfoDetails\'));window.getSelection().addRange(range);document.execCommand(\'copy\');">Copy to Clipboard</button> ';
+            this.infoOptions.content= this.infoOptions.content+'</div><button onclick="console.log(document.getElementById(\'voterinfo.SOS_VOTERID\').innerHTML);;">Follow Up!</button> ';
 
             //this.infoOptions.content = marker.infoText;
             //check if its the same marker that was selected if yes toggle
@@ -262,8 +284,8 @@ export default {
       console.log('    AFTER sortVotersList: function(sortKey=) {' + sortKey);
     },
     compare( a, b, keyValue='RESIDENTIAL_ADDRESS1' ) {
-      console.log('compare( a, b, keyValue=RESIDENTIAL_ADDRESS1 ) {');
-      if (keyValue.toLowerCase().indexOf('votes')>0) {
+      // console.log('compare( a, b, keyValue = ' + keyValue);
+      if (keyValue.toLowerCase().indexOf('Vote')>0) {
         return b[keyValue] - a[keyValue];
       }
       if ( a[keyValue] < b[keyValue] ){
@@ -286,13 +308,14 @@ export default {
     getPrecincts() {
       var targetUrl='/precincts';
       console.log('getPrecincts-- targetUrl=' + targetUrl);
+      console.log('getPrecincts-- this.axios=' + JSON.stringify(this.axios.defaults) );
        this.axios.get(targetUrl).then(response => {
-              console.log(response.data);
+              console.log('getPrecincts() {=' + response.data);
               this.precincts = response.data;
           //end of happy path... 
           }).catch(function (error) {
                 // handle error
-                console.log(error);
+                console.log('getPrecincts() {=' + error);
                 this.precincts = ["WARREN CITY 1A","WARREN CITY 1B","WARREN CITY 1E","WARREN CITY 1G","WARREN CITY 2C","WARREN CITY 2F","WARREN CITY 2G","WARREN CITY 3D","WARREN CITY 3G","WARREN CITY 3J","WARREN CITY 3K","WARREN CITY 3L","WARREN CITY 4A","WARREN CITY 4D","WARREN CITY 4F","WARREN CITY 5D","WARREN CITY 5E","WARREN CITY 5F","WARREN CITY 5G","WARREN CITY 5K","WARREN CITY 6B","WARREN CITY 6D","WARREN CITY 6G","WARREN CITY 7A","WARREN CITY 7C","WARREN CITY 7D"];
               });
     },
@@ -440,13 +463,13 @@ export default {
     parseVoterInfoText(voterinfo) {
       console.log('parseVoterInfoText() {=' + voterinfo.SOS_VOTERID + voterinfo.LAST_NAME);
 
-      var voterInfoText = '<label>OhioID:'+ voterinfo.SOS_VOTERID + ' </label><br/>';
+      var voterInfoText = '<label id="voterinfo.SOS_VOTERID" value="'+ voterinfo.SOS_VOTERID + '">'+ voterinfo.SOS_VOTERID + ' </label><br/>';
       // voterInfoText = voterInfoText + '<label> CountyID:'+ voterinfo.COUNTY_ID + '</label><br/>';
       voterInfoText = voterInfoText + '<label>'+ voterinfo.FIRST_NAME + ' </label> ';
       voterInfoText = voterInfoText + '<label> '+ voterinfo.LAST_NAME + ' </label><br/>';
-      voterInfoText = voterInfoText + '<label>'+ voterinfo.RESIDENTIAL_ADDRESS1 + ' </label>';
-      voterInfoText = voterInfoText + '<label>  '+ (voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '</label><br/>';
-      voterInfoText = voterInfoText + '<label>  '+ (voterinfo.PRECINCT_NAME ||'') + '</label><br/>';
+      // voterInfoText = voterInfoText + '<label>'+ voterinfo.RESIDENTIAL_ADDRESS1 + ' </label>';
+      // voterInfoText = voterInfoText + '<label>  '+ (voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '</label><br/>';
+      // voterInfoText = voterInfoText + '<label>  '+ (voterinfo.PRECINCT_NAME ||'') + '</label><br/>';
       voterInfoText = voterInfoText + '<label>Reg:'+voterinfo.REGISTRATION_DATE + '</label>,';
       voterInfoText = voterInfoText + '<label>Birth:'+voterinfo.DATE_OF_BIRTH + '</label><br/>';
       // voterInfoText = voterInfoText + '<textarea class="form-control" v-model="voterinfo.notes" placeholder="add multiple lines" rows="5" cols="30">'+(voterinfo.notes ||'')+'</textarea><br/>';
@@ -457,15 +480,15 @@ export default {
       return voterInfoText;
     },
     parseVoterAddressInfoText(voterinfo) {
-      console.log('parseVoterAddressInfoText() creating header {=' + voterinfo.RESIDENTIAL_ADDRESS1  + voterinfo.SOS_VOTERID + voterinfo.LAST_NAME);
+      console.log('parseVoter Address InfoText() creating header {=' + voterinfo.RESIDENTIAL_ADDRESS1  + voterinfo.SOS_VOTERID + voterinfo.LAST_NAME);
 
-      var voterInfoText = '';
-      voterInfoText = voterInfoText + '<label>'+ voterinfo.RESIDENTIAL_ADDRESS1 + ' </label>';
-      voterInfoText = voterInfoText + '<label>  '+ (voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '</label><br/>';
-      voterInfoText = voterInfoText + '<label>  '+ (voterinfo.PRECINCT_NAME ||'') + '</label><br/>';
+      var voterInfoAddrText = '';
+      voterInfoAddrText = voterInfoAddrText + '<label id="voterinfo.RESIDENTIAL_ADDRESS1" class="voterInfoAddrTextbold">'+ voterinfo.RESIDENTIAL_ADDRESS1 + ' </label>';
+      voterInfoAddrText = voterInfoAddrText + '<label id="voterinfo.RESIDENTIAL_ADDRESS2">  '+ (voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '</label><br/>';
+      voterInfoAddrText = voterInfoAddrText + '<label id="voterinfo.PRECINCT_NAME">  '+ (voterinfo.PRECINCT_NAME ||'') + '</label><br/>';
 
-      this.infoOptionAddressText = voterInfoText;
-      return voterInfoText;
+      this.infoOptionAddressText = voterInfoAddrText;
+      return voterInfoAddrText.toString();
     },
     selectCopy(containerid) {
       console.log('selectCopy(containerid) { = ' + containerid);
@@ -546,4 +569,5 @@ export default {
     font-size: smaller;
     border-spacing: 1px;
   }
+  .voterInfoAddrTextbold {font-weight: bold;}
 </style>

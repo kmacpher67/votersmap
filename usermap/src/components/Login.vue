@@ -21,6 +21,7 @@
         name: "Login",
         data(){
             return {
+            
                 username : "john",
                 password : "changeme",
                 message: "",
@@ -36,7 +37,11 @@
                     password: this.password      
                 } 
                 console.log('data=' + data)
-                axios.post("/auth/login", data)    
+
+
+
+                axios.defaults.serverHostPort=3000;
+                axios.post("/auth/login", data)  
                     .then((response) => {    
                         console.log("Logged in response=" + JSON.stringify(response, null,3))
                         // //  result -> {"userId":1,"username":"john"}

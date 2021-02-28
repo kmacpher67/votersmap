@@ -11,6 +11,29 @@ router.beforeEach((to, from, next) => {
   console.log('index.js-router.beforeEach((to:' + JSON.stringify(to, null, 3) +', from, next) => { ' + from + JSON.stringify(next,null, 3));
   console.log('localStorage = ' + JSON.stringify(localStorage,null,3));
 
+  if (to.path === "/") {
+    console.log('checking to for uri = / rerouting to /home!!!!');
+    // next.path='/home'
+    // next.name='Home'
+    // next.fullPath='/home'
+    // next({
+    //   path: '/home',
+    //   name: 'Home'
+      // })
+      // object
+      router.push({ path: 'home' });
+  }
+
+  if (to.path === "/logout") {
+    console.log('logout!!! woah. clearing USERS & jwt!!! ');
+
+    localStorage.clear('jwt');
+    localStorage.clear('user');
+    router.push({ path: 'login' });
+  }
+
+  // console.log(' axios =defaults ' + JSON.stringify(axios.defaults, null, 3) );
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     console.log('index.js-router.beforeEach record.meta.requiresAuthtrue jwt=' + localStorage.getItem('jwt'));
     if (localStorage.getItem('jwt') == null) {

@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <HelloWorld> </HelloWorld>
-
+      this is home public page? 
   </div>
 </template>
 

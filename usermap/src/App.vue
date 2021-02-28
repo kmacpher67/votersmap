@@ -1,7 +1,7 @@
 <template>
   <div id="app">
       <div id="sidebar scrollable-menu">
-      <router-link class = "nav-link" v-if="!isOnLoginPage()" to="/">Public | </router-link>
+      <!-- <router-link class = "nav-link" v-if="!isOnLoginPage()" to="/">Public | </router-link> -->
       <router-link class = "nav-link" v-if="!isOnLoginPage()" to="/home">Home  _|_ </router-link>
       <!-- <router-link to="/profile">Profile</router-link>  |  -->
       <router-link class = "nav-link" v-if="!isOnLoginPage()" to="/login" active-class="user">Login</router-link> 

@@ -1,4 +1,8 @@
-module.exports = { runtimeCompiler: true, }
+module.exports = { runtimeCompiler: true,
+    configureWebpack: {
+        devtool: 'source-map'
+      }
+}
 
 
 
