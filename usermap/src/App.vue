@@ -1,17 +1,30 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Public</router-link> |
-      <router-link to="/home">Home</router-link> |
-      <router-link to="/about">About</router-link>  | 
-      <router-link to="/profile">Profile</router-link>  | 
-      <router-link to="/login" active-class="user">Login</router-link> 
-      <!-- <a href="#" v-on:click="logout">Logout</a>   -->
+      <div id="sidebar scrollable-menu">
+      <router-link class = "nav-link" v-if="!isOnLoginPage()" to="/">Public | </router-link>
+      <router-link class = "nav-link" v-if="!isOnLoginPage()" to="/home">Home  _|_ </router-link>
+      <!-- <router-link to="/profile">Profile</router-link>  |  -->
+      <router-link class = "nav-link" v-if="!isOnLoginPage()" to="/login" active-class="user">Login</router-link> 
     </div>
-    <router-view/>
+    <router-view/> 
   </div>
 </template>
 
+<script>
+export default {
+  data () {
+    return {
+
+    }
+  },
+  methods: {
+    // is it the login page? otherwise don't show the nav.
+    isOnLoginPage: function() {
+      return this.$route.path != '/login' || this.$route.path === '/'
+    }
+  }
+}
+</script>
 
 <style>
 #app {

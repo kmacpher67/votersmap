@@ -1,4 +1,15 @@
-# usermap
+# usermap UI VueJS 
+
+Using VueJS as the html user interface framework: 
+https://github.com/vuejs/awesome-vue
+
+This current beta version did not use a specific boilerplate or appraoch. Kind of hacked togther: 
+1. nestjs backend using axios `"vue-axios": "^3.2.2",`
+2. vuejs google maps plugin: `vue2-google-maps`
+3. vuejs router implementatio: `"vue-router": "^3.5.1"`
+4. vuejs passport authN: `"vue-passport"`
+5. 
+
 
 ## kinda need this:
 
