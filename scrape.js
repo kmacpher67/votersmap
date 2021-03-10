@@ -23,7 +23,7 @@ const url = "https://www6.ohiosos.gov/ords/f?p=VOTERFTP:DOWNLOAD::FILE:NO:2:P2_P
             if (err)
               console.error('Pipeline failed.', err);
             else
-              console.log('Pipeline succeeded.');
+              console.log('Pipeline succeeded. wrote file.bytesWritten =' + file.bytesWritten);
           }
         );
       });

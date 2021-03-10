@@ -43,10 +43,10 @@ export class Voter {
   PartyAffiliation: string;
 
   @Prop()
-  residentialAddress_1: string;
+  RESIDENTIAL_ADDRESS1: string;
 
   @Prop()
-  ResidentialAddress2: string;
+  RESIDENTIAL_SECONDARY_ADDR: string;
 
   @Prop()
   residential_city: string;

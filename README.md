@@ -1,12 +1,37 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
+  <a href="" target="blank"><img src="" width="320" alt="Citizen Tools" /></a>
 </p>
+
+BETA VERSION 
+========
+
+There 
 
 ## Voter data base location 
 https://www6.ohiosos.gov/ords/f?p=VOTERFTP:HOME::::::
 
 
+# Backend Nest JS database and details: 
+
+HINT
+For quickly creating a CRUD controller with the validation built-in, you may use the CLI's CRUD generator: nest g resource [name].
+
 ## Data Dictionary 
+
+db.getCollection('voters').createIndex({"SOS_VOTERID":1})
+db.getCollection('voters').createIndex({"lastUpdate":1})
+db.getCollection('voters').createIndex({"PRECINCT_NAME":1})
+
+
+{
+    "createdCollectionAutomatically" : false,
+    "numIndexesBefore" : 2,
+    "numIndexesAfter" : 3,
+    "ok" : 1.0
+}
+
+
+See the Ohio SOS Voter_File_Layout.docx for details.
 
 SOS Voter Id
 County Number
@@ -27,6 +52,131 @@ Residential Zip
 Residential Zip Plus 4
 Residential Country
 Residential Postal Code
+
+Current flat map from SOS website download and insert: 
+
+_id
+/* 1 */
+{
+    "_id" : object,
+    "SOS_VOTERID" : string,
+    "COUNTY_NUMBER" : string,
+    "COUNTY_ID" : string,
+    "LAST_NAME" : string,
+    "FIRST_NAME" : string,
+    "MIDDLE_NAME" : string,
+    "SUFFIX" : string,
+    "DATE_OF_BIRTH" : string,
+    "REGISTRATION_DATE" : string,
+    "VOTER_STATUS" : string,
+    "PARTY_AFFILIATION" : string,
+    "RESIDENTIAL_ADDRESS1" : string,
+    "RESIDENTIAL_SECONDARY_ADDR" : string,
+    "RESIDENTIAL_CITY" : string,
+    "RESIDENTIAL_STATE" : string,
+    "RESIDENTIAL_ZIP" : string,
+    "RESIDENTIAL_ZIP_PLUS4" : string,
+    "RESIDENTIAL_COUNTRY" : string,
+    "RESIDENTIAL_POSTALCODE" : string,
+    "MAILING_ADDRESS1" : 1.0,
+    "MAILING_SECONDARY_ADDRESS" : 1.0,
+    "MAILING_CITY" : 1.0,
+    "MAILING_STATE" : 1.0,
+    "MAILING_ZIP" : 1.0,
+    "MAILING_ZIP_PLUS4" : 1.0,
+    "MAILING_COUNTRY" : 1.0,
+    "MAILING_POSTAL_CODE" : 1.0,
+    "CAREER_CENTER" : 1.0,
+    "CITY" : 1.0,
+    "CITY_SCHOOL_DISTRICT" : 1.0,
+    "COUNTY_COURT_DISTRICT" : 1.0,
+    "CONGRESSIONAL_DISTRICT" : 1.0,
+    "COURT_OF_APPEALS" : 1.0,
+    "EDU_SERVICE_CENTER_DISTRICT" : 1.0,
+    "EXEMPTED_VILL_SCHOOL_DISTRICT" : 1.0,
+    "LIBRARY" : 1.0,
+    "LOCAL_SCHOOL_DISTRICT" : 1.0,
+    "MUNICIPAL_COURT_DISTRICT" : 1.0,
+    "PRECINCT_NAME" : 1.0,
+    "PRECINCT_CODE" : 1.0,
+    "STATE_BOARD_OF_EDUCATION" : 1.0,
+    "STATE_REPRESENTATIVE_DISTRICT" : 1.0,
+    "STATE_SENATE_DISTRICT" : 1.0,
+    "TOWNSHIP" : 1.0,
+    "VILLAGE" : 1.0,
+    "WARD" : 1.0,
+    "PRIMARY-03/07/2000" : 1.0,
+    "GENERAL-11/07/2000" : 1.0,
+    "SPECIAL-05/08/2001" : 1.0,
+    "GENERAL-11/06/2001" : 1.0,
+    "PRIMARY-05/07/2002" : 1.0,
+    "GENERAL-11/05/2002" : 1.0,
+    "SPECIAL-05/06/2003" : 1.0,
+    "GENERAL-11/04/2003" : 1.0,
+    "PRIMARY-03/02/2004" : 1.0,
+    "GENERAL-11/02/2004" : 1.0,
+    "SPECIAL-02/08/2005" : 1.0,
+    "PRIMARY-05/03/2005" : 1.0,
+    "PRIMARY-09/13/2005" : 1.0,
+    "GENERAL-11/08/2005" : 1.0,
+    "SPECIAL-02/07/2006" : 1.0,
+    "PRIMARY-05/02/2006" : 1.0,
+    "GENERAL-11/07/2006" : 1.0,
+    "PRIMARY-05/08/2007" : 1.0,
+    "PRIMARY-09/11/2007" : 1.0,
+    "GENERAL-11/06/2007" : 1.0,
+    "PRIMARY-11/06/2007" : 1.0,
+    "GENERAL-12/11/2007" : 1.0,
+    "PRIMARY-03/04/2008" : 1.0,
+    "PRIMARY-10/14/2008" : 1.0,
+    "GENERAL-11/04/2008" : 1.0,
+    "GENERAL-11/18/2008" : 1.0,
+    "PRIMARY-05/05/2009" : 1.0,
+    "PRIMARY-09/08/2009" : 1.0,
+    "PRIMARY-09/15/2009" : 1.0,
+    "PRIMARY-09/29/2009" : 1.0,
+    "GENERAL-11/03/2009" : 1.0,
+    "PRIMARY-05/04/2010" : 1.0,
+    "PRIMARY-07/13/2010" : 1.0,
+    "PRIMARY-09/07/2010" : 1.0,
+    "GENERAL-11/02/2010" : 1.0,
+    "PRIMARY-05/03/2011" : 1.0,
+    "PRIMARY-09/13/2011" : 1.0,
+    "GENERAL-11/08/2011" : 1.0,
+    "PRIMARY-03/06/2012" : 1.0,
+    "GENERAL-11/06/2012" : 1.0,
+    "PRIMARY-05/07/2013" : 1.0,
+    "PRIMARY-09/10/2013" : 1.0,
+    "PRIMARY-10/01/2013" : 1.0,
+    "GENERAL-11/05/2013" : 1.0,
+    "PRIMARY-05/06/2014" : 1.0,
+    "GENERAL-11/04/2014" : 1.0,
+    "PRIMARY-05/05/2015" : 1.0,
+    "PRIMARY-09/15/2015" : 1.0,
+    "GENERAL-11/03/2015" : 1.0,
+    "PRIMARY-03/15/2016" : 1.0,
+    "GENERAL-06/07/2016" : 1.0,
+    "PRIMARY-09/13/2016" : 1.0,
+    "GENERAL-11/08/2016" : 1.0,
+    "PRIMARY-05/02/2017" : 1.0,
+    "PRIMARY-09/12/2017" : 1.0,
+    "GENERAL-11/07/2017" : 1.0,
+    "PRIMARY-05/08/2018" : 1.0,
+    "GENERAL-08/07/2018" : 1.0,
+    "GENERAL-11/06/2018" : 1.0,
+    "PRIMARY-05/07/2019" : 1.0,
+    "PRIMARY-09/10/2019" : 1.0,
+    "GENERAL-11/05/2019" : 1.0,
+    "PRIMARY-03/17/2020" : 1.0,
+    "GENERAL-11/03/2020" : 1.0,
+    "demVotes" : 1.0,
+    "geometry" : 1.0,
+    "muniVotes" : 1.0,
+    "place_id" : 1.0,
+    "repVotes" : 1.0,
+    "totalVotes" : 1.0,
+    "types" : 1.0
+}
 
 
 ## Seeding Data from SOS site: 

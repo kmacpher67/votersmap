@@ -11,7 +11,7 @@ export interface Voter {
   VoterStatus: string;
   PartyAffiliation: string;
   ResidentialAddress1: string;
-  ResidentialAddress2: string;
+  RESIDENTIAL_SECONDARY_ADDR: string;
   ResidentialCity: string;
   ResidentialZip: string;
   Ward: string;

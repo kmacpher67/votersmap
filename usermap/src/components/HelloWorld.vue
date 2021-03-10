@@ -80,7 +80,7 @@
                     <td style="font-size: smaller;">{{voter.LAST_NAME.toLowerCase().trim()}} </td>
                     <td style="font-size: smaller;">{{voter.FIRST_NAME.toLowerCase().trim()}} </td>
                     <td style="font-size: smaller;">{{voter.streetNum}}</td>
-                    <td style="font-size: smaller;">{{voter.street}} {{voter.RESIDENTIAL_ADDRESS2}}</td>
+                    <td style="font-size: smaller;">{{voter.street}} {{voter.RESIDENTIAL_SECONDARY_ADDR}}</td>
                     <td style="font-size: smaller;">{{voter.DATE_OF_BIRTH.substr(0, 4)}}</td>
                     <td style="text-align:center">{{voter.muniVotes}}</td>
                     <td style="text-align:center">{{voter.totalVotes}}</td>
@@ -559,7 +559,7 @@ export default {
       voterInfoText = voterInfoText + '<label>'+ voterinfo.FIRST_NAME + ' </label> ';
       voterInfoText = voterInfoText + '<label> '+ voterinfo.LAST_NAME + ' </label><br/>';
       // voterInfoText = voterInfoText + '<label>'+ voterinfo.RESIDENTIAL_ADDRESS1 + ' </label>';
-      // voterInfoText = voterInfoText + '<label>  '+ (voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '</label><br/>';
+      // voterInfoText = voterInfoText + '<label>  '+ (voterinfo.RESIDENTIAL_SECONDARY_ADDR ||'') + '</label><br/>';
       // voterInfoText = voterInfoText + '<label>  '+ (voterinfo.PRECINCT_NAME ||'') + '</label><br/>';
       voterInfoText = voterInfoText + '<label>Reg:'+voterinfo.REGISTRATION_DATE + '</label>,';
       voterInfoText = voterInfoText + '<label>Birth:'+voterinfo.DATE_OF_BIRTH + '</label><br/>';
@@ -575,7 +575,7 @@ export default {
 
       var voterInfoAddrText = '';
       voterInfoAddrText = voterInfoAddrText + '<label id="voterinfo.RESIDENTIAL_ADDRESS1" class="voterInfoAddrTextbold">'+ voterinfo.RESIDENTIAL_ADDRESS1 + ' </label>';
-      voterInfoAddrText = voterInfoAddrText + '<label id="voterinfo.RESIDENTIAL_ADDRESS2">  '+ (voterinfo.RESIDENTIAL_ADDRESS2 ||'') + '</label><br/>';
+      voterInfoAddrText = voterInfoAddrText + '<label id="voterinfo.RESIDENTIAL_SECONDARY_ADDR">  '+ (voterinfo.RESIDENTIAL_SECONDARY_ADDR ||'') + '</label><br/>';
       voterInfoAddrText = voterInfoAddrText + '<label id="voterinfo.PRECINCT_NAME">  '+ (voterinfo.PRECINCT_NAME ||'') + '</label><br/>';
 
       this.infoOptionAddressText = voterInfoAddrText;

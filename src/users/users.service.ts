@@ -31,6 +31,41 @@ export class UsersService {
         username: 'jason',
         password: 'overthrow',
         },
+    {
+        userId: 6,
+        username: 'andy',
+        password: 'overthrow',
+        },
+    {
+      userId: 7,
+      username: 'don',
+      password: 'overthrow',
+      },
+  {
+      userId: 8,
+      username: 'amanda',
+      password: 'overthrow',
+      },
+  {
+      userId: 9,
+      username: 'ashley',
+      password: 'overthrow', 
+  },
+  {
+    userId: 10,
+    username: 'ward1',
+    password: 'overthrow', 
+    },
+  {
+      userId: 11,
+      username: 'ward2',
+      password: 'overthrow', 
+   },
+  {
+    userId: 12,
+    username: 'ward5',
+    password: 'overthrow', 
+  },
   ];
 
   async findOne(username: string): Promise<User | undefined> {
